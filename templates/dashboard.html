@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ScholarForge{% endblock %}
+
+{% block content %}
+<div style="margin-top: 2rem;">
+    <h2>Welcome to your Dashboard, {{ name }}!</h2>
+    <p>Manage your academic research and publications here.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+        <div class="form-container" style="margin: 0; max-width: 100%;">
+            <h3>Upload New Paper</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Submit your latest research for publication and certification.</p>
+            <a href="#" class="btn btn-primary">Start Upload</a>
+        </div>
+        
+        <div class="form-container" style="margin: 0; max-width: 100%;">
+            <h3>My Publications</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">View and manage your approved research papers.</p>
+            <a href="#" class="btn">View Papers</a>
+        </div>
+        
+        <div class="form-container" style="margin: 0; max-width: 100%;">
+            <h3>Certificates</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Download verified certificates for your published work.</p>
+            <a href="#" class="btn btn-accent">View Certificates</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

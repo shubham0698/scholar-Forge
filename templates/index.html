@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}ScholarForge - Research Publication Platform{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Publish Your Academic <span>Research</span></h1>
+    <p>The premier platform for students to publish papers, receive verifiable certificates, and build a lasting academic portfolio.</p>
+    <div class="hero-buttons">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Start Publishing</a>
+        <a href="#" class="btn">Explore Papers</a>
+    </div>
+</section>
+
+<section class="features" style="margin-bottom: 5rem;">
+    <h2 style="text-align: center; margin-bottom: 3rem; color: #002244;">Why Choose ScholarForge?</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
+            <h3 style="color: var(--secondary-color);">Verifiable Certificates</h3>
+            <p style="color: var(--text-muted);">Automatically generate verifiable PDF certificates with unique QR codes for every published paper.</p>
+        </div>
+        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
+            <h3 style="color: var(--secondary-color);">Academic Portfolio</h3>
+            <p style="color: var(--text-muted);">Build a lasting portfolio that showcases your research, contributions, and mentorship details.</p>
+        </div>
+        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
+            <h3 style="color: var(--secondary-color);">Author Ownership</h3>
+            <p style="color: var(--text-muted);">You retain full copyright of your work. We provide the platform and verification infrastructure.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

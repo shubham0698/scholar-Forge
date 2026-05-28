@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Create an Account</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label for="username">Full Name (as it appears on certificates)</label>
+            <input type="text" id="username" name="username" class="form-control" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="email">Academic or Personal Email</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Account Role</label>
+            <select id="role" name="role" class="form-control" required>
+                <option value="student">Student</option>
+                <option value="guide">Guide / Faculty</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="institution">College / Institution</label>
+            <input type="text" id="institution" name="institution" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="department">Department</label>
+            <input type="text" id="department" name="department" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+    </form>
+    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+    </p>
+</div>
+{% endblock %}
