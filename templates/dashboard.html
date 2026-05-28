@@ -11,19 +11,13 @@
         <div class="form-container" style="margin: 0; max-width: 100%;">
             <h3>Upload New Paper</h3>
             <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Submit your latest research for publication and certification.</p>
-            <a href="#" class="btn btn-primary">Start Upload</a>
+            <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Upload</a>
         </div>
         
         <div class="form-container" style="margin: 0; max-width: 100%;">
             <h3>My Publications</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">View and manage your approved research papers.</p>
-            <a href="#" class="btn">View Papers</a>
-        </div>
-        
-        <div class="form-container" style="margin: 0; max-width: 100%;">
-            <h3>Certificates</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Download verified certificates for your published work.</p>
-            <a href="#" class="btn btn-accent">View Certificates</a>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">View, edit, or manage your published and private research papers.</p>
+            <a href="{{ url_for('my_publications') }}" class="btn">View Papers</a>
         </div>
     </div>
 </div>

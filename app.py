@@ -2,12 +2,15 @@ import os
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from models import db, User, Paper, Guide, Contributor, Certificate
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dev-secret-key-change-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///scholarforge_v2.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///scholarforge_v3.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'uploads'
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 db.init_app(app)
 
@@ -102,6 +105,91 @@ def profile():
 @login_required
 def payment():
     return render_template('payment.html')
+
+@app.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        abstract = request.form.get('abstract')
+        category = request.form.get('category')
+        keywords = request.form.get('keywords')
+        visibility = request.form.get('visibility', 'public')
+        
+        # Guide details
+        guide_name = request.form.get('guide_name')
+        guide_designation = request.form.get('guide_designation')
+        guide_department = request.form.get('guide_department')
+        guide_institution = request.form.get('guide_institution')
+        
+        # File upload
+        file = request.files.get('file')
+        file_path = None
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{current_user.id}_{filename}")
+            file.save(file_path)
+            
+        new_paper = Paper(
+            title=title, abstract=abstract, category=category, 
+            keywords=keywords, visibility=visibility, file_path=file_path, 
+            user_id=current_user.id
+        )
+        db.session.add(new_paper)
+        db.session.commit()
+        
+        if guide_name:
+            new_guide = Guide(
+                name=guide_name, designation=guide_designation,
+                department=guide_department, institution=guide_institution,
+                paper_id=new_paper.id
+            )
+            db.session.add(new_guide)
+            db.session.commit()
+            
+        flash('Paper uploaded successfully!')
+        return redirect(url_for('my_publications'))
+        
+    return render_template('upload.html')
+
+@app.route('/my-publications')
+@login_required
+def my_publications():
+    papers = Paper.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_publications.html', papers=papers)
+
+@app.route('/edit-paper/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_paper(id):
+    paper = Paper.query.get_or_404(id)
+    if paper.user_id != current_user.id:
+        flash('Unauthorized access')
+        return redirect(url_for('my_publications'))
+        
+    if request.method == 'POST':
+        paper.title = request.form.get('title')
+        paper.abstract = request.form.get('abstract')
+        paper.category = request.form.get('category')
+        paper.keywords = request.form.get('keywords')
+        paper.visibility = request.form.get('visibility')
+        db.session.commit()
+        flash('Paper updated successfully!')
+        return redirect(url_for('my_publications'))
+        
+    return render_template('edit_paper.html', paper=paper)
+
+@app.route('/delete-paper/<int:id>', methods=['POST'])
+@login_required
+def delete_paper(id):
+    paper = Paper.query.get_or_404(id)
+    if paper.user_id != current_user.id:
+        flash('Unauthorized access')
+        return redirect(url_for('my_publications'))
+        
+    db.session.delete(paper)
+    db.session.commit()
+    flash('Paper deleted successfully!')
+    return redirect(url_for('my_publications'))
 
 @app.route('/search')
 def search():

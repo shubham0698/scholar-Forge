@@ -25,6 +25,7 @@ class Paper(db.Model):
     category = db.Column(db.String(100), nullable=False)
     keywords = db.Column(db.String(250), nullable=False)
     status = db.Column(db.String(50), default='draft') # draft, pending, approved, rejected
+    visibility = db.Column(db.String(50), default='public') # public, private
     file_path = db.Column(db.String(250), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

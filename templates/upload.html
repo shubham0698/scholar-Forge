@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Paper - ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px; margin-top: 2rem;">
+    <h2>Upload Research Paper</h2>
+    <hr style="border-color: var(--border-color); margin: 1rem 0 2rem;">
+    
+    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+        <h3>Paper Metadata</h3>
+        <div class="form-group">
+            <label for="title">Paper Title</label>
+            <input type="text" id="title" name="title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="abstract">Abstract</label>
+            <textarea id="abstract" name="abstract" class="form-control" rows="5" required></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label for="category">Category (Domain)</label>
+                <input type="text" id="category" name="category" class="form-control" placeholder="e.g. Computer Science" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="keywords">Keywords</label>
+                <input type="text" id="keywords" name="keywords" class="form-control" placeholder="Comma separated" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="visibility">Visibility</label>
+            <select id="visibility" name="visibility" class="form-control" required>
+                <option value="public">Public (Visible to everyone)</option>
+                <option value="private">Private (Only visible to you)</option>
+            </select>
+        </div>
+        
+        <h3 style="margin-top: 2rem;">Guide / Mentor Details</h3>
+        <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label for="guide_name">Guide Name</label>
+                <input type="text" id="guide_name" name="guide_name" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="guide_designation">Designation</label>
+                <input type="text" id="guide_designation" name="guide_designation" class="form-control">
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label for="guide_department">Department</label>
+                <input type="text" id="guide_department" name="guide_department" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="guide_institution">Institution</label>
+                <input type="text" id="guide_institution" name="guide_institution" class="form-control">
+            </div>
+        </div>
+        
+        <h3 style="margin-top: 2rem;">Upload File</h3>
+        <div class="form-group">
+            <label for="file">Research Paper (PDF format recommended)</label>
+            <input type="file" id="file" name="file" class="form-control" accept=".pdf,.doc,.docx" required>
+        </div>
+        
+        <hr style="border-color: var(--border-color); margin: 2rem 0 1.5rem;">
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Upload and Submit</button>
+    </form>
+</div>
+{% endblock %}

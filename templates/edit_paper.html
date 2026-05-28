@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Paper - ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px; margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Edit Paper Metadata</h2>
+        <a href="{{ url_for('my_publications') }}" class="btn">Back</a>
+    </div>
+    <hr style="border-color: var(--border-color); margin: 1rem 0 2rem;">
+    
+    <form method="POST" action="{{ url_for('edit_paper', id=paper.id) }}">
+        <div class="form-group">
+            <label for="title">Paper Title</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ paper.title }}" required>
+        </div>
+        <div class="form-group">
+            <label for="abstract">Abstract</label>
+            <textarea id="abstract" name="abstract" class="form-control" rows="5" required>{{ paper.abstract }}</textarea>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label for="category">Category (Domain)</label>
+                <input type="text" id="category" name="category" class="form-control" value="{{ paper.category }}" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="keywords">Keywords</label>
+                <input type="text" id="keywords" name="keywords" class="form-control" value="{{ paper.keywords }}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="visibility">Visibility</label>
+            <select id="visibility" name="visibility" class="form-control" required>
+                <option value="public" {% if paper.visibility == 'public' %}selected{% endif %}>Public (Visible to everyone)</option>
+                <option value="private" {% if paper.visibility == 'private' %}selected{% endif %}>Private (Only visible to you)</option>
+            </select>
+        </div>
+        
+        <hr style="border-color: var(--border-color); margin: 2rem 0 1.5rem;">
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
