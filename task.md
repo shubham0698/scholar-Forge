@@ -1,0 +1,32 @@
+# ScholarForge Development Tasks
+
+- [x] Project Setup
+  - [x] Initialize Python Virtual Environment & Install dependencies (Flask, SQLAlchemy, etc.)
+  - [x] Set up basic directory structure (templates, static)
+  - [x] Copy logo to static/img folder
+  - [x] Create `app.py` with basic routing
+  - [x] Create `models.py` with database schemas (User, Paper, Guide, Contributor, Certificate)
+- [x] Base Layout & Design (Vanilla CSS)
+  - [x] Create `static/css/style.css` (Premium, dynamic design, navy/gold/cyan palette)
+  - [x] Create `templates/base.html` layout
+- [x] Authentication System
+  - [x] Create `register.html` and `login.html`
+  - [x] Implement User Registration with password hashing
+  - [x] Implement User Login
+  - [x] Implement Profile Page (`profile.html`)
+- [x] Core Publication Features
+  - [x] Create Dashboard (`dashboard.html`)
+  - [x] Implement Paper Upload form (`upload.html`)
+  - [x] Implement Paper details and metadata saving
+- [ ] Administration & Payments
+  - [ ] Admin panel structure
+  - [ ] Payment page (`payment.html`) placeholder
+- [ ] Certificate Generation (Python)
+  - [ ] Setup `reportlab`, `qrcode`, `Pillow` logic
+  - [ ] Generate Certificate PDF with dynamic data and QR code
+- [ ] Verification System
+  - [ ] Verification Route (`/verify/<id>`)
+  - [ ] Public Verification Page (`verify.html`)
+- [ ] Polish & Final Testing
+  - [ ] Validate responsive design
+  - [ ] Test upload and certificate workflow

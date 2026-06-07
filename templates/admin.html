@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Admin Dashboard</h2>
+    <p>Manage users, papers, and platform operations.</p>
+</div>
+
+<!-- Admin Subnav -->
+<div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+    <a href="{{ url_for('admin_papers') }}" class="btn btn-primary">Manage Papers</a>
+    <a href="{{ url_for('admin_users') }}" class="btn btn-primary">Manage Users</a>
+</div>
+
+<!-- Stats -->
+<div class="card-grid" style="margin-bottom: 2.5rem;">
+    <div class="card" style="text-align: center;">
+        <div class="card-icon" style="margin: 0 auto 1rem;">👥</div>
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--primary);">{{ total_users }}</h3>
+        <p class="text-muted">Total Users</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div class="card-icon" style="margin: 0 auto 1rem;">📄</div>
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--primary);">{{ total_papers }}</h3>
+        <p class="text-muted">Total Papers</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div class="card-icon" style="margin: 0 auto 1rem;">✅</div>
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--success);">{{ approved_papers }}</h3>
+        <p class="text-muted">Approved Papers</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div class="card-icon" style="margin: 0 auto 1rem;">🎓</div>
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--accent);">{{ total_certs }}</h3>
+        <p class="text-muted">Certificates Issued</p>
+    </div>
+</div>
+
+<!-- Pending Papers -->
+<h3 class="mb-3">📋 Pending Papers ({{ pending_papers|length }})</h3>
+
+{% if pending_papers %}
+<div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 3rem;">
+    {% for paper in pending_papers %}
+    <div class="paper-card">
+        <div>
+            <h3 style="margin-bottom: 0.3rem;"><a href="{{ url_for('paper_detail', id=paper.id) }}" target="_blank">{{ paper.title }}</a></h3>
+            <span class="badge">{{ paper.category }}</span>
+            <p class="text-secondary" style="font-size: 0.9rem;">{{ paper.abstract[:200] }}...</p>
+            <div class="paper-meta">
+                <span>👤 {{ paper.author.username }}</span>
+                <span>📧 {{ paper.author.email }}</span>
+                <span>📅 {{ paper.created_at.strftime('%b %d, %Y') }}</span>
+                <span>🏫 {{ paper.author.institution or 'N/A' }}</span>
+            </div>
+        </div>
+        <div class="paper-actions">
+            <form action="{{ url_for('admin_approve', id=paper.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.5rem;">✅ Approve</button>
+            </form>
+            <form action="{{ url_for('admin_reject', id=paper.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Reject this paper?');">
+                <button type="submit" class="btn btn-danger" style="width: 100%; padding: 0.5rem;">❌ Reject</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state" style="margin-bottom: 3rem;">
+    <div class="empty-state-icon">🎉</div>
+    <h3>No pending papers</h3>
+    <p>All papers have been reviewed.</p>
+</div>
+{% endif %}
+
+<!-- Recent Users -->
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+    <h3 class="mb-3">👥 Recent Users</h3>
+    <a href="{{ url_for('admin_users') }}">View All Users &rarr;</a>
+</div>
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+        <thead>
+            <tr style="background: var(--bg-body); text-align: left;">
+                <th style="padding: 0.85rem 1.25rem; font-weight: 600; color: var(--text-secondary);">Name</th>
+                <th style="padding: 0.85rem 1.25rem; font-weight: 600; color: var(--text-secondary);">Email</th>
+                <th style="padding: 0.85rem 1.25rem; font-weight: 600; color: var(--text-secondary);">Role</th>
+                <th style="padding: 0.85rem 1.25rem; font-weight: 600; color: var(--text-secondary);">Joined</th>
+                <th style="padding: 0.85rem 1.25rem; font-weight: 600; color: var(--text-secondary);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in recent_users %}
+            <tr style="border-top: 1px solid var(--border);">
+                <td style="padding: 0.75rem 1.25rem;">{{ user.username }}</td>
+                <td style="padding: 0.75rem 1.25rem; color: var(--text-secondary);">{{ user.email }}</td>
+                <td style="padding: 0.75rem 1.25rem;">
+                    <span class="badge {% if user.is_admin %}badge-warning{% endif %}" style="margin-bottom: 0;">
+                        {{ 'Admin' if user.is_admin else user.role|capitalize }}
+                    </span>
+                </td>
+                <td style="padding: 0.75rem 1.25rem; color: var(--text-muted);">{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                <td style="padding: 0.75rem 1.25rem;">
+                    {% if not user.is_admin %}
+                    <form action="{{ url_for('make_admin', id=user.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Make this user an admin?');">
+                        <button type="submit" class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.78rem;">Make Admin</button>
+                    </form>
+                    {% else %}
+                    <span class="text-muted" style="font-size: 0.82rem;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

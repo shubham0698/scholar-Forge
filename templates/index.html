@@ -1,32 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}ScholarForge - Research Publication Platform{% endblock %}
+{% block title %}ScholarForge — Research Publication Platform{% endblock %}
 
 {% block content %}
 <section class="hero">
     <h1>Publish Your Academic <span>Research</span></h1>
-    <p>The premier platform for students to publish papers, receive verifiable certificates, and build a lasting academic portfolio.</p>
+    <p>The premier platform for students to publish papers, receive verifiable certificates, and build a lasting
+        academic portfolio.</p>
     <div class="hero-buttons">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Publishing</a>
+        {% else %}
         <a href="{{ url_for('register') }}" class="btn btn-primary">Start Publishing</a>
-        <a href="#" class="btn">Explore Papers</a>
+        {% endif %}
+        <a href="{{ url_for('explore') }}" class="btn">Explore Papers</a>
     </div>
 </section>
 
-<section class="features" style="margin-bottom: 5rem;">
-    <h2 style="text-align: center; margin-bottom: 3rem; color: #002244;">Why Choose ScholarForge?</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
-            <h3 style="color: var(--secondary-color);">Verifiable Certificates</h3>
-            <p style="color: var(--text-muted);">Automatically generate verifiable PDF certificates with unique QR codes for every published paper.</p>
+<!-- Stats Section -->
+<div class="card-grid" style="margin-bottom: 5rem;">
+    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
+        <h3 class="text-primary" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_papers }}</h3>
+        <p class="text-secondary font-weight-bold">Published Papers</p>
+    </div>
+    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
+        <h3 class="text-success" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_users }}</h3>
+        <p class="text-secondary font-weight-bold">Researchers Worldwide</p>
+    </div>
+    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
+        <h3 class="text-accent" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_certs }}</h3>
+        <p class="text-secondary font-weight-bold">Certificates Issued</p>
+    </div>
+</div>
+
+<section class="features-section">
+    <h2>Why Choose ScholarForge?</h2>
+    <p>Everything you need to launch your academic career</p>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">📜</div>
+            <h3>Verifiable Certificates</h3>
+            <p>Automatically generate verifiable PDF certificates with unique QR codes for every published paper.</p>
         </div>
-        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
-            <h3 style="color: var(--secondary-color);">Academic Portfolio</h3>
-            <p style="color: var(--text-muted);">Build a lasting portfolio that showcases your research, contributions, and mentorship details.</p>
+        <div class="card">
+            <div class="card-icon">📁</div>
+            <h3>Academic Portfolio</h3>
+            <p>Build a lasting portfolio that showcases your research, contributions, and mentorship details.</p>
         </div>
-        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 2rem;">
-            <h3 style="color: var(--secondary-color);">Author Ownership</h3>
-            <p style="color: var(--text-muted);">You retain full copyright of your work. We provide the platform and verification infrastructure.</p>
+        <div class="card">
+            <div class="card-icon">🔒</div>
+            <h3>Author Ownership</h3>
+            <p>You retain full copyright of your work. We provide the platform and verification infrastructure.</p>
         </div>
     </div>
+</section>
+
+<!-- Call to action -->
+<section style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center; color: white; margin-bottom: 4rem; box-shadow: var(--shadow-lg);">
+    <h2 style="color: white; margin-bottom: 1rem; font-size: 2.2rem;">Ready to share your research?</h2>
+    <p style="color: rgba(255,255,255,0.8); margin-bottom: 2rem; font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">Join thousands of students building their academic portfolio on ScholarForge today.</p>
+    <a href="{{ url_for('register') }}" class="btn btn-accent" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Create Free Account</a>
 </section>
 {% endblock %}

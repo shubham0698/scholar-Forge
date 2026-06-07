@@ -1,56 +1,72 @@
 {% extends 'base.html' %}
 
-{% block title %}My Publications - ScholarForge{% endblock %}
+{% block title %}My Publications — ScholarForge{% endblock %}
 
 {% block content %}
-<div style="margin-top: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2>My Publications</h2>
-        <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload New Paper</a>
-    </div>
-    
-    {% if papers %}
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        {% for paper in papers %}
-            <div class="form-container" style="margin: 0; max-width: 100%; padding: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h3 style="margin-bottom: 0.5rem;">{{ paper.title }}</h3>
-                    <span style="display: inline-block; background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; color: var(--secondary-color); margin-bottom: 1rem;">
-                        {{ paper.category }}
+<div class="page-header-row">
+    <h2>My Publications</h2>
+    <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload New Paper</a>
+</div>
+
+{% if papers %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    {% for paper in papers %}
+        <div class="paper-card">
+            <div style="flex: 1;">
+                <h3>{{ paper.title }}</h3>
+                <span class="badge">{{ paper.category }}</span>
+                {% if paper.publication_id %}
+                <span class="badge badge-success" style="margin-left: 0.25rem;">{{ paper.publication_id }}</span>
+                {% endif %}
+                <p class="text-secondary" style="font-size: 0.92rem;">{{ paper.abstract[:150] }}...</p>
+
+                <div class="paper-meta">
+                    <span><strong>Status:</strong>
+                        {% if paper.status == 'approved' %}
+                            <span class="text-success">Approved</span>
+                        {% elif paper.status == 'pending' %}
+                            <span class="text-accent">Pending</span>
+                        {% elif paper.status == 'rejected' %}
+                            <span class="text-danger">Rejected</span>
+                        {% else %}
+                            {{ paper.status|capitalize }}
+                        {% endif %}
                     </span>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">{{ paper.abstract[:150] }}...</p>
-                    
-                    <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1.5rem;">
-                        <span><strong>Status:</strong> {{ paper.status|capitalize }}</span>
-                        <span>
-                            <strong>Visibility:</strong> 
-                            {% if paper.visibility == 'public' %}
-                                <span style="color: #28a745;">Public</span>
-                            {% else %}
-                                <span style="color: var(--accent-color);">Private</span>
-                            {% endif %}
-                        </span>
-                    </div>
-                </div>
-                
-                <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 120px;">
-                    <a href="{{ url_for('edit_paper', id=paper.id) }}" class="btn" style="text-align: center; padding: 0.5rem;">Edit Metadata</a>
-                    {% if paper.file_path %}
-                        <a href="#" class="btn btn-accent" style="text-align: center; padding: 0.5rem;">View PDF</a>
-                    {% endif %}
-                    <form action="{{ url_for('delete_paper', id=paper.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this paper?');">
-                        <button type="submit" class="btn" style="width: 100%; border-color: #dc3545; color: #dc3545; padding: 0.5rem;">Delete</button>
-                    </form>
+                    <span>
+                        <strong>Visibility:</strong>
+                        {% if paper.visibility == 'public' %}
+                            <span class="text-success">Public</span>
+                        {% else %}
+                            <span class="text-accent">Private</span>
+                        {% endif %}
+                    </span>
+                    <span>📅 {{ paper.created_at.strftime('%b %d, %Y') }}</span>
                 </div>
             </div>
-        {% endfor %}
+
+            <div class="paper-actions">
+                <a href="{{ url_for('edit_paper', id=paper.id) }}" class="btn">Edit</a>
+                {% if paper.file_path %}
+                    <a href="{{ url_for('view_pdf', id=paper.id) }}" class="btn btn-accent" target="_blank">View PDF</a>
+                {% endif %}
+                {% if paper.status == 'approved' and not paper.certificate %}
+                    <a href="{{ url_for('payment', paper_id=paper.id) }}" class="btn btn-primary">Pay &amp; Get Certificate</a>
+                {% elif paper.certificate %}
+                    <a href="{{ url_for('certificate_view', certificate_id=paper.certificate.certificate_id) }}" class="btn btn-primary">View Certificate</a>
+                {% endif %}
+                <form action="{{ url_for('delete_paper', id=paper.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this paper?');">
+                    <button type="submit" class="btn btn-danger" style="width: 100%;">Delete</button>
+                </form>
+            </div>
         </div>
-    {% else %}
-        <div class="form-container" style="margin: 0; max-width: 100%; text-align: center; padding: 3rem;">
-            <h3>No publications yet</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">You haven't uploaded any research papers.</p>
-            <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Uploading</a>
-        </div>
-    {% endif %}
-</div>
+    {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📄</div>
+        <h3>No publications yet</h3>
+        <p>You haven't uploaded any research papers.</p>
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Uploading</a>
+    </div>
+{% endif %}
 {% endblock %}

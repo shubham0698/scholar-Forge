@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ paper.title }} — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 1.5rem;">
+    <span class="badge">{{ paper.category }}</span>
+    <h2>{{ paper.title }}</h2>
+    <div class="paper-meta">
+        <span>👤 {{ paper.author.username }}</span>
+        <span>📅 {{ paper.created_at.strftime('%B %d, %Y') }}</span>
+        {% if paper.publication_id %}
+        <span class="badge badge-success" style="margin-bottom: 0;">ID: {{ paper.publication_id }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    <div style="flex: 3; min-width: 300px;">
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3 class="mb-2">Abstract</h3>
+            <p style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.8;">{{ paper.abstract }}</p>
+        </div>
+
+        {% if contributors %}
+        <div class="card">
+            <h3 class="mb-2">Contributors</h3>
+            <ul>
+                {% for c in contributors %}
+                <li><strong>{{ c.name }}</strong> ({{ c.role }}) - {{ c.affiliation }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="flex: 1; min-width: 250px;">
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 class="mb-2">Metadata</h3>
+            <div class="profile-row" style="padding: 0.5rem 0;">
+                <span class="profile-label">Keywords</span>
+                <span class="profile-value">{{ paper.keywords }}</span>
+            </div>
+            {% if guide %}
+            <div class="profile-row" style="padding: 0.5rem 0;">
+                <span class="profile-label">Guide</span>
+                <span class="profile-value">{{ guide.name }} ({{ guide.designation }})</span>
+            </div>
+            <div class="profile-row" style="padding: 0.5rem 0;">
+                <span class="profile-label">Institution</span>
+                <span class="profile-value">{{ guide.institution }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card text-center">
+            {% if paper.file_path %}
+                <a href="{{ url_for('view_pdf', id=paper.id) }}" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" target="_blank">📄 View PDF</a>
+            {% else %}
+                <p class="text-muted mb-2">No PDF available</p>
+            {% endif %}
+            
+            {% if paper.certificate %}
+                <a href="{{ url_for('verify_certificate', certificate_id=paper.certificate.certificate_id) }}" class="btn" style="width: 100%;" target="_blank">🎓 View Certificate</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin) %}
+                <hr>
+                <a href="{{ url_for('edit_paper', id=paper.id) }}" class="btn btn-accent" style="width: 100%;">✏️ Edit Paper</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

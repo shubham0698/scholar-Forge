@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Upload Paper - ScholarForge{% endblock %}
+{% block title %}Upload Paper — ScholarForge{% endblock %}
 
 {% block content %}
 <div class="form-container" style="max-width: 800px; margin-top: 2rem;">
     <h2>Upload Research Paper</h2>
-    <hr style="border-color: var(--border-color); margin: 1rem 0 2rem;">
+    <hr>
     
     <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
-        <h3>Paper Metadata</h3>
+        <h3 class="mb-2">Paper Metadata</h3>
         <div class="form-group">
             <label for="title">Paper Title</label>
             <input type="text" id="title" name="title" class="form-control" required>
@@ -17,7 +17,7 @@
             <label for="abstract">Abstract</label>
             <textarea id="abstract" name="abstract" class="form-control" rows="5" required></textarea>
         </div>
-        <div style="display: flex; gap: 1rem;">
+        <div class="gap-row">
             <div class="form-group" style="flex: 1;">
                 <label for="category">Category (Domain)</label>
                 <input type="text" id="category" name="category" class="form-control" placeholder="e.g. Computer Science" required>
@@ -35,8 +35,8 @@
             </select>
         </div>
         
-        <h3 style="margin-top: 2rem;">Guide / Mentor Details</h3>
-        <div style="display: flex; gap: 1rem;">
+        <h3 class="mt-4 mb-2">Guide / Mentor Details</h3>
+        <div class="gap-row">
             <div class="form-group" style="flex: 1;">
                 <label for="guide_name">Guide Name</label>
                 <input type="text" id="guide_name" name="guide_name" class="form-control">
@@ -46,7 +46,7 @@
                 <input type="text" id="guide_designation" name="guide_designation" class="form-control">
             </div>
         </div>
-        <div style="display: flex; gap: 1rem;">
+        <div class="gap-row">
             <div class="form-group" style="flex: 1;">
                 <label for="guide_department">Department</label>
                 <input type="text" id="guide_department" name="guide_department" class="form-control">
@@ -56,15 +56,58 @@
                 <input type="text" id="guide_institution" name="guide_institution" class="form-control">
             </div>
         </div>
+
+        <h3 class="mt-4 mb-2">Contributors (Optional)</h3>
+        <p class="text-muted mb-2" style="font-size: 0.85rem;">Add other researchers who contributed to this paper.</p>
+        <div id="contributors-container">
+            <div class="contributor-row gap-row" style="margin-bottom: 0.5rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                    <label>Name</label>
+                    <input type="text" name="contributor_name[]" class="form-control" placeholder="Jane Doe">
+                </div>
+                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                    <label>Role</label>
+                    <input type="text" name="contributor_role[]" class="form-control" placeholder="e.g. Data Analysis">
+                </div>
+                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                    <label>Affiliation</label>
+                    <input type="text" name="contributor_affiliation[]" class="form-control" placeholder="University Name">
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-accent mt-2" onclick="addContributor()" style="font-size: 0.8rem; padding: 0.5rem 1rem;">+ Add Another Contributor</button>
         
-        <h3 style="margin-top: 2rem;">Upload File</h3>
+        <h3 class="mt-4 mb-2">Upload File</h3>
         <div class="form-group">
             <label for="file">Research Paper (PDF format recommended)</label>
             <input type="file" id="file" name="file" class="form-control" accept=".pdf,.doc,.docx" required>
         </div>
         
-        <hr style="border-color: var(--border-color); margin: 2rem 0 1.5rem;">
+        <hr>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Upload and Submit</button>
     </form>
 </div>
+
+<script>
+function addContributor() {
+    const container = document.getElementById('contributors-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'contributor-row gap-row';
+    newRow.style.marginBottom = '0.5rem';
+    newRow.style.alignItems = 'flex-end';
+    newRow.innerHTML = `
+        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+            <input type="text" name="contributor_name[]" class="form-control" placeholder="Name">
+        </div>
+        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+            <input type="text" name="contributor_role[]" class="form-control" placeholder="Role">
+        </div>
+        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+            <input type="text" name="contributor_affiliation[]" class="form-control" placeholder="Affiliation">
+        </div>
+        <button type="button" class="btn btn-danger" style="padding: 0.6rem 0.8rem; height: 100%;" onclick="this.parentElement.remove()">X</button>
+    `;
+    container.appendChild(newRow);
+}
+</script>
 {% endblock %}

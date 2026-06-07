@@ -5,3 +5,5 @@ Werkzeug==3.1.8
 reportlab==4.5.1
 qrcode==8.2
 Pillow==12.2.0
+gunicorn==23.0.0
+Flask-Mail==0.10.0

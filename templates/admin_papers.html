@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Papers — ScholarForge Admin{% endblock %}
+
+{% block content %}
+<div class="page-header-row">
+    <div>
+        <h2>Manage Papers</h2>
+        <p class="text-secondary">View, approve, reject, and delete research papers.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn">Back to Dashboard</a>
+</div>
+
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <form action="{{ url_for('admin_papers') }}" method="GET" class="search-form" style="margin: 0; max-width: 400px; flex: 1;">
+        <input type="text" name="q" value="{{ search_q }}" placeholder="Search titles or keywords..." class="search-input">
+        <input type="hidden" name="status" value="{{ status_filter }}">
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+    
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="{{ url_for('admin_papers') }}" class="btn {% if not status_filter %}btn-primary{% endif %}">All</a>
+        <a href="{{ url_for('admin_papers', status='pending', q=search_q) }}" class="btn {% if status_filter == 'pending' %}btn-primary{% endif %}">Pending</a>
+        <a href="{{ url_for('admin_papers', status='approved', q=search_q) }}" class="btn {% if status_filter == 'approved' %}btn-primary{% endif %}">Approved</a>
+        <a href="{{ url_for('admin_papers', status='rejected', q=search_q) }}" class="btn {% if status_filter == 'rejected' %}btn-primary{% endif %}">Rejected</a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+        <thead>
+            <tr style="background: var(--bg-body); text-align: left;">
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600; width: 40%;">Paper Details</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Author</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Status/Vis.</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Date</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in papers %}
+            <tr style="border-top: 1px solid var(--border);">
+                <td style="padding: 1rem;">
+                    <strong><a href="{{ url_for('paper_detail', id=p.id) }}" target="_blank">{{ p.title }}</a></strong>
+                    <div style="margin-top: 0.25rem;">
+                        <span class="badge" style="margin: 0; padding: 0.15rem 0.5rem; font-size: 0.7rem;">{{ p.category }}</span>
+                        {% if p.publication_id %}
+                        <span class="badge badge-success" style="margin: 0; padding: 0.15rem 0.5rem; font-size: 0.7rem;">{{ p.publication_id }}</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td style="padding: 1rem;">{{ p.author.username }}</td>
+                <td style="padding: 1rem;">
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;" class="
+                        {% if p.status == 'approved' %}text-success
+                        {% elif p.status == 'pending' %}text-accent
+                        {% elif p.status == 'rejected' %}text-danger
+                        {% endif %}
+                    ">{{ p.status|upper }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ p.visibility|capitalize }}</div>
+                </td>
+                <td style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem;">{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        {% if p.status == 'pending' %}
+                        <form action="{{ url_for('admin_approve', id=p.id) }}" method="POST" style="margin:0;">
+                            <input type="hidden" name="next" value="{{ request.url }}">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin_reject', id=p.id) }}" method="POST" style="margin:0;">
+                            <input type="hidden" name="next" value="{{ request.url }}">
+                            <button type="submit" class="btn btn-accent" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Reject</button>
+                        </form>
+                        {% endif %}
+                        <form action="{{ url_for('admin_delete_paper', id=p.id) }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="return confirm('Delete this paper permanently?');">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="padding: 2rem; text-align: center;">No papers found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

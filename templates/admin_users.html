@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users — ScholarForge Admin{% endblock %}
+
+{% block content %}
+<div class="page-header-row">
+    <div>
+        <h2>Manage Users</h2>
+        <p class="text-secondary">View and manage all registered accounts.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn">Back to Dashboard</a>
+</div>
+
+<form action="{{ url_for('admin_users') }}" method="GET" class="search-form" style="margin: 0 0 2rem 0; max-width: 500px;">
+    <input type="text" name="q" value="{{ search_q }}" placeholder="Search by name, email, or institution..." class="search-input">
+    <button type="submit" class="search-btn">Search</button>
+</form>
+
+<div class="card" style="padding: 0; overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+        <thead>
+            <tr style="background: var(--bg-body); text-align: left;">
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">ID</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Name</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Email</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Role</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Joined</th>
+                <th style="padding: 1rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr style="border-top: 1px solid var(--border);">
+                <td style="padding: 1rem;">{{ u.id }}</td>
+                <td style="padding: 1rem;"><strong>{{ u.username }}</strong><br><small class="text-muted">{{ u.institution or 'No inst.' }}</small></td>
+                <td style="padding: 1rem;">{{ u.email }}</td>
+                <td style="padding: 1rem;">
+                    <span class="badge {% if u.is_admin %}badge-warning{% endif %}">{{ 'Admin' if u.is_admin else u.role|capitalize }}</span>
+                </td>
+                <td style="padding: 1rem; color: var(--text-muted);">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                <td style="padding: 1rem; display: flex; gap: 0.5rem;">
+                    {% if not u.is_admin %}
+                    <form action="{{ url_for('make_admin', id=u.id) }}" method="POST" style="margin:0;">
+                        <input type="hidden" name="next" value="{{ request.url }}">
+                        <button type="submit" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="return confirm('Make admin?');">Admin</button>
+                    </form>
+                    <form action="{{ url_for('admin_delete_user', id=u.id) }}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="return confirm('WARNING: This deletes the user and ALL their papers permanently! Proceed?');">Delete</button>
+                    </form>
+                    {% else %}
+                    <span class="text-muted" style="font-size: 0.8rem;">Protected</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="padding: 2rem; text-align: center;">No users found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

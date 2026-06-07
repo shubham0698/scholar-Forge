@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="ScholarForge — The premier academic platform for students to publish research, gain verifiable certification, and build their portfolio.">
     <title>{% block title %}ScholarForge{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
@@ -14,22 +19,34 @@
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ScholarForge Logo">
                 ScholarForge
             </a>
-            
-            <form action="{{ url_for('search') }}" method="GET" class="search-form">
-                <input type="text" name="q" placeholder="Search papers, authors, topics..." class="search-input" required>
+
+            <form action="{{ url_for('search') }}" method="GET" class="search-form" id="nav-search">
+                <input type="text" name="q" placeholder="Search papers, authors, topics…" class="search-input" required>
                 <button type="submit" class="search-btn">Search</button>
             </form>
 
-            <ul class="nav-links">
+            <!-- Hamburger icon for mobile -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul class="nav-links" id="nav-links">
                 <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('explore') }}">Explore</a></li>
+                <li><a href="{{ url_for('verify_lookup') }}">Verify</a></li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
-                    <li><a href="{{ url_for('payment') }}">Payment</a></li>
-                    <li><a href="{{ url_for('logout') }}" class="btn">Logout</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('my_certificates') }}">Certificates</a></li>
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('admin_panel') }}">Admin</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}" class="btn">Logout</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
-                    <li><a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}" class="btn btn-primary" style="color: white;">Sign Up</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -37,15 +54,15 @@
 
     <main class="container">
         {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class="flash-messages">
-                {% for message in messages %}
-                    <li class="flash-message">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for message in messages %}
+            <li class="flash-message">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         {% endwith %}
-        
+
         {% block content %}{% endblock %}
     </main>
 
@@ -53,22 +70,23 @@
         <div class="container footer-content">
             <div class="footer-section">
                 <h4>ScholarForge</h4>
-                <p>The premier academic platform for students to publish research, gain verifiable certification, and build their portfolio.</p>
+                <p>The premier academic platform for students to publish research, gain verifiable certification, and
+                    build their portfolio.</p>
             </div>
             <div class="footer-section">
                 <h4>Platform</h4>
                 <ul>
-                    <li><a href="#">Explore Papers</a></li>
-                    <li><a href="#">Verification Center</a></li>
-                    <li><a href="#">Institutions</a></li>
+                    <li><a href="{{ url_for('explore') }}">Explore Papers</a></li>
+                    <li><a href="{{ url_for('verify_lookup') }}">Verification Center</a></li>
+                    <li><a href="{{ url_for('about') }}">About Us</a></li>
                 </ul>
             </div>
             <div class="footer-section">
-                <h4>Legal</h4>
+                <h4>Support & Legal</h4>
                 <ul>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Copyright Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -76,5 +94,22 @@
             <p>&copy; 2026 ScholarForge. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            const navSearch = document.getElementById('nav-search');
+
+            if (hamburger) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    navLinks.classList.toggle('active');
+                    navSearch.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Papers — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Explore Published Research</h2>
+    <p>Browse verified and approved papers from researchers worldwide.</p>
+</div>
+
+<!-- Category filter -->
+<div style="margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <a href="{{ url_for('explore') }}" class="btn {% if not selected_category %}btn-primary{% endif %}" style="padding: 0.4rem 1rem; font-size: 0.82rem;">All</a>
+    {% for cat in categories %}
+    <a href="{{ url_for('explore', category=cat) }}" class="btn {% if selected_category == cat %}btn-primary{% endif %}" style="padding: 0.4rem 1rem; font-size: 0.82rem;">{{ cat }}</a>
+    {% endfor %}
+</div>
+
+{% if papers %}
+    <div class="card-grid">
+    {% for paper in papers %}
+        <div class="card">
+            <span class="badge">{{ paper.category }}</span>
+            <h3><a href="{{ url_for('paper_detail', id=paper.id) }}">{{ paper.title }}</a></h3>
+            <p>{{ paper.abstract[:150] }}...</p>
+            <div class="paper-meta" style="margin-top: auto; padding-top: 1rem;">
+                <span>👤 {{ paper.author.username }}</span>
+                <span>📅 {{ paper.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            {% if paper.publication_id %}
+            <div style="margin-top: 0.75rem;">
+                <span class="badge badge-success" style="margin-bottom: 0;">{{ paper.publication_id }}</span>
+            </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <h3>No papers published yet</h3>
+        <p>Check back later or be the first to publish!</p>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload a Paper</a>
+        {% else %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

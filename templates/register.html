@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Register - ScholarForge{% endblock %}
+{% block title %}Register — ScholarForge{% endblock %}
 
 {% block content %}
 <div class="form-container">
     <h2>Create an Account</h2>
+    <p class="text-secondary mb-3">Join thousands of student researchers worldwide.</p>
     <form method="POST" action="{{ url_for('register') }}">
         <div class="form-group">
             <label for="username">Full Name (as it appears on certificates)</label>
-            <input type="text" id="username" name="username" class="form-control" required autofocus>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Jane Doe" required autofocus>
         </div>
         <div class="form-group">
             <label for="email">Academic or Personal Email</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+            <input type="email" id="email" name="email" class="form-control" placeholder="you@university.edu" required>
         </div>
         <div class="form-group">
             <label for="role">Account Role</label>
@@ -23,19 +24,19 @@
         </div>
         <div class="form-group">
             <label for="institution">College / Institution</label>
-            <input type="text" id="institution" name="institution" class="form-control" required>
+            <input type="text" id="institution" name="institution" class="form-control" placeholder="e.g. MIT" required>
         </div>
         <div class="form-group">
             <label for="department">Department</label>
-            <input type="text" id="department" name="department" class="form-control" required>
+            <input type="text" id="department" name="department" class="form-control" placeholder="e.g. Computer Science" required>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Sign Up</button>
     </form>
-    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+    <p class="text-center mt-3 text-secondary" style="font-size: 0.88rem;">
         Already have an account? <a href="{{ url_for('login') }}">Login</a>
     </p>
 </div>

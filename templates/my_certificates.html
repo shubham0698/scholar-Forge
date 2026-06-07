@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}My Certificates — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>My Certificates</h2>
+    <p>View and download your official ScholarForge certificates.</p>
+</div>
+
+{% if certificates %}
+    <div class="card-grid">
+    {% for cert in certificates %}
+        <div class="card" style="display: flex; flex-direction: column;">
+            <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <span class="badge badge-success">Verified</span>
+                    {% if cert.qr_code_path %}
+                    <img src="{{ url_for('static', filename=cert.qr_code_path.replace('static/', '').replace('static\\\\', '')) }}" alt="QR" style="width: 40px; height: 40px; border-radius: 4px;">
+                    {% endif %}
+                </div>
+                
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">{{ cert.paper.title }}</h3>
+                <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 1rem;">Issued: {{ cert.issue_date.strftime('%b %d, %Y') }}</p>
+                <p class="text-muted" style="font-size: 0.8rem; font-family: monospace; margin-bottom: 1rem;">ID: {{ cert.certificate_id }}</p>
+            </div>
+            <div class="paper-actions" style="margin-top: auto; display: flex; flex-direction: row; gap: 0.5rem; width: 100%;">
+                <a href="{{ url_for('download_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-primary" style="flex: 1;">Download</a>
+                <a href="{{ url_for('verify_certificate', certificate_id=cert.certificate_id) }}" class="btn" style="flex: 1;" target="_blank">View</a>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🎓</div>
+        <h3>No certificates yet</h3>
+        <p>You haven't earned any certificates. Publish a paper to get started!</p>
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">Publish Paper</a>
+    </div>
+{% endif %}
+{% endblock %}

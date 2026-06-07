@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Certificate — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 4rem 0 2rem;">
+    <h2>Certificate Verification</h2>
+    <p>Enter a certificate ID below to verify its authenticity.</p>
+</div>
+
+<div class="form-container" style="margin-top: 0; text-align: center;">
+    <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 1.5rem; color: var(--primary);">🛡️</div>
+    <form action="{{ url_for('verify_lookup') }}" method="POST">
+        <div class="form-group">
+            <input type="text" name="certificate_id" class="form-control" placeholder="e.g. SF-CERT-1A2B3C4D" style="text-align: center; font-size: 1.1rem; padding: 1rem;" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Verify Now</button>
+    </form>
+    <p class="text-muted mt-3" style="font-size: 0.85rem;">You can also scan the QR code on the certificate directly.</p>
+</div>
+{% endblock %}

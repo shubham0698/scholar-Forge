@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate — ScholarForge{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card" style="text-align: center; padding: 3rem 2.5rem;">
+        <div style="margin-bottom: 1.5rem;">
+            <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(79,70,229,0.1); color: var(--primary); padding: 0.5rem 1.25rem; border-radius: 100px; font-weight: 700; font-size: 0.9rem;">
+                🎓 Certificate Generated
+            </span>
+        </div>
+
+        <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Your Certificate is Ready!</h2>
+        <p class="text-secondary" style="margin-bottom: 2rem;">Congratulations on publishing "{{ paper.title }}".</p>
+
+        <hr>
+
+        <div style="text-align: left; margin-top: 1.5rem;">
+            <div class="profile-row">
+                <span class="profile-label">Certificate ID</span>
+                <span class="profile-value" style="font-family: monospace; color: var(--primary);">{{ certificate.certificate_id }}</span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label">Publication ID</span>
+                <span class="profile-value" style="font-family: monospace;">{{ paper.publication_id }}</span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label">Issued On</span>
+                <span class="profile-value">{{ certificate.issue_date.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="profile-row">
+                <span class="profile-label">Verification Link</span>
+                <span class="profile-value">
+                    <a href="{{ url_for('verify_certificate', certificate_id=certificate.certificate_id) }}">
+                        {{ url_for('verify_certificate', certificate_id=certificate.certificate_id, _external=True) }}
+                    </a>
+                </span>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('download_certificate', certificate_id=certificate.certificate_id) }}" class="btn btn-primary">
+                📥 Download Certificate PDF
+            </a>
+            <a href="{{ url_for('verify_certificate', certificate_id=certificate.certificate_id) }}" class="btn" target="_blank">
+                🔗 View Public Verification
+            </a>
+        </div>
+
+        {% if certificate.qr_code_path %}
+        <div style="margin-top: 2rem;">
+            <img src="{{ url_for('static', filename=certificate.qr_code_path.replace('static/', '').replace('static\\\\', '')) }}" alt="QR Code" style="width: 100px; height: 100px; border-radius: 8px;">
+            <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.5rem;">Scan to verify</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

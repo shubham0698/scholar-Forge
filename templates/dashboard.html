@@ -1,24 +1,57 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - ScholarForge{% endblock %}
+{% block title %}Dashboard — ScholarForge{% endblock %}
 
 {% block content %}
-<div style="margin-top: 2rem;">
-    <h2>Welcome to your Dashboard, {{ name }}!</h2>
-    <p>Manage your academic research and publications here.</p>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-        <div class="form-container" style="margin: 0; max-width: 100%;">
-            <h3>Upload New Paper</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Submit your latest research for publication and certification.</p>
-            <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Upload</a>
-        </div>
-        
-        <div class="form-container" style="margin: 0; max-width: 100%;">
-            <h3>My Publications</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">View, edit, or manage your published and private research papers.</p>
-            <a href="{{ url_for('my_publications') }}" class="btn">View Papers</a>
-        </div>
+<div class="page-header">
+    <h2>Welcome back, {{ name }}!</h2>
+    <p>Manage your academic research and publications from here.</p>
+</div>
+
+<!-- Stats row -->
+<div class="card-grid" style="margin-bottom: 2.5rem;">
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--primary);">{{ paper_count }}</h3>
+        <p class="text-muted mb-0">Total Papers</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--success);">{{ approved_count }}</h3>
+        <p class="text-muted mb-0">Approved</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--accent);">{{ cert_count }}</h3>
+        <p class="text-muted mb-0">Certificates</p>
     </div>
 </div>
+
+<div class="card-grid">
+    <div class="card">
+        <div class="card-icon">📤</div>
+        <h3>Upload New Paper</h3>
+        <p>Submit your latest research for publication and certification.</p>
+        <a href="{{ url_for('upload') }}" class="btn btn-primary mt-3">Start Upload</a>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">📚</div>
+        <h3>My Publications</h3>
+        <p>View, edit, or manage your published and private research papers.</p>
+        <a href="{{ url_for('my_publications') }}" class="btn mt-3">View Papers</a>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">🎓</div>
+        <h3>My Certificates</h3>
+        <p>View and download your official ScholarForge PDF certificates.</p>
+        <a href="{{ url_for('my_certificates') }}" class="btn mt-3">View Certificates</a>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-icon">🌐</div>
+        <h3>Explore Research</h3>
+        <p>Browse published papers from researchers around the world.</p>
+        <a href="{{ url_for('explore') }}" class="btn mt-3">Explore</a>
+    </div>
+</div>
+
 {% endblock %}

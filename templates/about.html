@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}About — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 4rem 0 2rem;">
+    <h1>About <span>ScholarForge</span></h1>
+    <p>Empowering the next generation of researchers with a seamless publication and verification platform.</p>
+</div>
+
+<div class="card" style="margin-bottom: 3rem;">
+    <h2>Our Mission</h2>
+    <p>ScholarForge was built to democratize academic publishing for students and early-career researchers. We believe that every valuable contribution to science and academia deserves a platform that is accessible, professional, and verifiable.</p>
+    <p class="mt-2">By providing instant, blockchain-inspired verified certificates, we aim to eliminate the friction and high costs associated with traditional publishing, while giving students a tangible asset for their academic portfolios.</p>
+</div>
+
+<div class="card-grid" style="margin-bottom: 3rem;">
+    <div class="card text-center">
+        <h3 class="text-primary" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_papers }}</h3>
+        <p class="text-secondary">Papers Published</p>
+    </div>
+    <div class="card text-center">
+        <h3 class="text-success" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_users }}</h3>
+        <p class="text-secondary">Researchers</p>
+    </div>
+    <div class="card text-center">
+        <h3 class="text-accent" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_certs }}</h3>
+        <p class="text-secondary">Certificates Issued</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>How It Works</h2>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">1</div>
+            <div>
+                <h4>Upload Research</h4>
+                <p class="text-secondary">Submit your paper along with metadata, keywords, and guide/mentor details.</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">2</div>
+            <div>
+                <h4>Review & Approval</h4>
+                <p class="text-secondary">Our admin team reviews the submission for platform guidelines and approves it.</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold;">3</div>
+            <div>
+                <h4>Generate Certificate</h4>
+                <p class="text-secondary">Pay a nominal processing fee to generate a professionally designed PDF certificate with a unique QR verification code.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Verify Your Email</h2>
+    <p class="text-secondary mb-3">We've sent a 6-digit verification code to <strong>{{ email }}</strong>.</p>
+    <form method="POST" action="{{ url_for('verify_email', email=email) }}">
+        <div class="form-group">
+            <label for="otp">Verification Code</label>
+            <input type="text" id="otp" name="otp" class="form-control" placeholder="123456" required minlength="6" maxlength="6" pattern="\d{6}" title="Please enter exactly 6 digits" autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Verify</button>
+    </form>
+    <p class="text-center mt-3 text-secondary" style="font-size: 0.88rem;">
+        Didn't receive the code? <a href="{{ url_for('resend_otp', email=email) }}">Resend Code</a>
+    </p>
+</div>
+{% endblock %}
