@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-header-row">
     <h2>My Publications</h2>
-    <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload New Paper</a>
+    <a href="{{ url_for('papers.upload') }}" class="btn btn-primary">Upload New Paper</a>
 </div>
 
 {% if papers %}
@@ -19,6 +19,19 @@
                 <span class="badge badge-success" style="margin-left: 0.25rem;">{{ paper.publication_id }}</span>
                 {% endif %}
                 <p class="text-secondary" style="font-size: 0.92rem;">{{ paper.abstract[:150] }}...</p>
+
+                {% if paper.status == 'pending' %}
+                <div style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin: 0.85rem 0; font-size: 0.88rem; color: var(--text-primary);">
+                    ⏳ <strong>In Verification Phase:</strong> Your paper is currently being reviewed by ScholarForge editors and peer reviewers. You will receive an email notification once evaluation is complete.
+                </div>
+                {% elif paper.status == 'rejected' %}
+                <div style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid var(--danger); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin: 0.85rem 0; font-size: 0.88rem; color: var(--text-primary);">
+                    ❌ <strong>Rejection Notice &amp; Editorial Feedback:</strong>
+                    <p style="margin: 0.35rem 0 0 0; font-style: italic; color: var(--danger); font-weight: 500;">
+                        "{{ paper.rejection_reason or 'Does not meet current editorial quality standards or guidelines.' }}"
+                    </p>
+                </div>
+                {% endif %}
 
                 <div class="paper-meta">
                     <span><strong>Status:</strong>
@@ -45,16 +58,17 @@
             </div>
 
             <div class="paper-actions">
-                <a href="{{ url_for('edit_paper', id=paper.id) }}" class="btn">Edit</a>
+                <a href="{{ url_for('public.paper_detail', id=paper.id) }}" class="btn btn-primary" style="font-weight: 600;">📖 Open Paper Reader</a>
+                <a href="{{ url_for('papers.edit_paper', id=paper.id) }}" class="btn">Edit</a>
                 {% if paper.file_path %}
-                    <a href="{{ url_for('view_pdf', id=paper.id) }}" class="btn btn-accent" target="_blank">View PDF</a>
+                    <a href="{{ url_for('papers.view_pdf', id=paper.id) }}" class="btn btn-accent" target="_blank">View PDF</a>
                 {% endif %}
                 {% if paper.status == 'approved' and not paper.certificate %}
-                    <a href="{{ url_for('payment', paper_id=paper.id) }}" class="btn btn-primary">Pay &amp; Get Certificate</a>
+                    <a href="{{ url_for('payments.payment', paper_id=paper.id) }}" class="btn btn-primary">Pay &amp; Get Certificate</a>
                 {% elif paper.certificate %}
-                    <a href="{{ url_for('certificate_view', certificate_id=paper.certificate.certificate_id) }}" class="btn btn-primary">View Certificate</a>
+                    <a href="{{ url_for('payments.certificate_view', certificate_id=paper.certificate.certificate_id) }}" class="btn btn-primary">View Certificate</a>
                 {% endif %}
-                <form action="{{ url_for('delete_paper', id=paper.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this paper?');">
+                <form action="{{ url_for('papers.delete_paper', id=paper.id) }}" method="POST" style="margin: 0; flex: 1 1 calc(50% - 0.5rem); min-width: 120px;" onsubmit="return confirm('Are you sure you want to delete this paper?');">
                     <button type="submit" class="btn btn-danger" style="width: 100%;">Delete</button>
                 </form>
             </div>
@@ -66,7 +80,7 @@
         <div class="empty-state-icon">📄</div>
         <h3>No publications yet</h3>
         <p>You haven't uploaded any research papers.</p>
-        <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Uploading</a>
+        <a href="{{ url_for('papers.upload') }}" class="btn btn-primary">Start Uploading</a>
     </div>
 {% endif %}
 {% endblock %}

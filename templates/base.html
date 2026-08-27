@@ -4,49 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="ScholarForge — The premier academic platform for students to publish research, gain verifiable certification, and build their portfolio.">
+    <meta name="description" content="ScholarForge — Premier academic open-access publishing platform. Mint DOIs, obtain cryptographically verifiable QR PDF certificates, and build a lasting academic portfolio.">
+    <meta name="keywords" content="academic publishing, research papers, peer review, student research, DOI minting, QR certificates, open access, ScholarForge, academic portfolio">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="ScholarForge Academic Platform">
+    
+    <!-- Open Graph (OG) Social Card Tags -->
+    <meta property="og:site_name" content="ScholarForge">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ScholarForge — Academic Research Publishing Platform">
+    <meta property="og:description" content="Publish academic research papers, receive verifiable PDF certificates, and build a lasting academic portfolio.">
+    <meta property="og:url" content="{{ request.url }}">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ScholarForge — Academic Research Publishing">
+    <meta name="twitter:description" content="Publish academic research, receive verifiable QR PDF certificates, and build your academic portfolio.">
+    
+    <!-- Sitemap XML Link -->
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ url_for('public.sitemap') }}">
+
+    {% block meta %}{% endblock %}
+
     <title>{% block title %}ScholarForge{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="{{ url_for('index') }}" class="navbar-brand">
+            <a href="{{ url_for('public.index') }}" class="navbar-brand">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ScholarForge Logo">
                 ScholarForge
             </a>
 
-            <form action="{{ url_for('search') }}" method="GET" class="search-form" id="nav-search">
+            <form action="{{ url_for('public.search') }}" method="GET" class="search-form" id="nav-search">
                 <input type="text" name="q" placeholder="Search papers, authors, topics…" class="search-input" required>
                 <button type="submit" class="search-btn">Search</button>
             </form>
 
             <!-- Hamburger icon for mobile -->
-            <div class="hamburger" id="hamburger">
+            <div class="hamburger" id="hamburger" role="button" aria-label="Toggle navigation menu" tabindex="0">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
 
             <ul class="nav-links" id="nav-links">
-                <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('explore') }}">Explore</a></li>
-                <li><a href="{{ url_for('verify_lookup') }}">Verify</a></li>
+                <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                <li><a href="{{ url_for('public.explore') }}">Explore</a></li>
+                <li><a href="{{ url_for('public.verify_lookup') }}">Verify</a></li>
                 {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('my_certificates') }}">Certificates</a></li>
-                <li><a href="{{ url_for('profile') }}">Profile</a></li>
-                {% if current_user.is_admin %}
-                <li><a href="{{ url_for('admin_panel') }}">Admin</a></li>
+                <li><a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('papers.my_certificates') }}">Certificates</a></li>
+                <li><a href="{{ url_for('dashboard.profile') }}">Profile</a></li>
+                {% if current_user.role in ['reviewer', 'guide', 'admin'] %}
+                <li><a href="{{ url_for('reviews.reviewer_dashboard') }}">Reviewer Panel</a></li>
                 {% endif %}
-                <li><a href="{{ url_for('logout') }}" class="btn">Logout</a></li>
+                {% if current_user.is_admin %}
+                <li><a href="{{ url_for('admin.admin_panel') }}">Admin Panel</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.logout') }}" class="btn">Logout</a></li>
                 {% else %}
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('register') }}" class="btn btn-primary" style="color: white;">Sign Up</a></li>
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary" style="color: white;">Sign Up</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -68,30 +90,58 @@
 
     <footer class="footer">
         <div class="container footer-content">
-            <div class="footer-section">
-                <h4>ScholarForge</h4>
-                <p>The premier academic platform for students to publish research, gain verifiable certification, and
-                    build their portfolio.</p>
+            <div class="footer-brand-section">
+                <a href="{{ url_for('public.index') }}" class="footer-brand-title">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ScholarForge Logo">
+                    ScholarForge
+                </a>
+                <p>
+                    The premier open-access academic publishing platform. Mint DOIs, obtain cryptographically verifiable QR PDF certificates, and build a lasting academic portfolio.
+                </p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="badge badge-success" style="margin: 0; font-size: 0.78rem;">🛡️ ISO-Compliant Verification</span>
+                    <span class="badge" style="margin: 0; font-size: 0.78rem; background: rgba(255,255,255,0.1); color: #cbd5e1;">🌐 OAI-PMH Indexed</span>
+                </div>
             </div>
+
             <div class="footer-section">
                 <h4>Platform</h4>
                 <ul>
-                    <li><a href="{{ url_for('explore') }}">Explore Papers</a></li>
-                    <li><a href="{{ url_for('verify_lookup') }}">Verification Center</a></li>
-                    <li><a href="{{ url_for('about') }}">About Us</a></li>
+                    <li><a href="{{ url_for('public.index') }}">Home Page</a></li>
+                    <li><a href="{{ url_for('public.explore') }}">Explore Papers</a></li>
+                    <li><a href="{{ url_for('public.verify_lookup') }}">Verification Center</a></li>
+                    <li><a href="{{ url_for('public.about') }}">About ScholarForge</a></li>
                 </ul>
             </div>
+
             <div class="footer-section">
-                <h4>Support & Legal</h4>
+                <h4>For Researchers</h4>
                 <ul>
-                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="{{ url_for('papers.upload') }}">Publish Research</a></li>
+                    <li><a href="{{ url_for('dashboard.dashboard') }}">Analytics Dashboard</a></li>
+                    <li><a href="{{ url_for('papers.my_certificates') }}">My Certificates</a></li>
+                    <li><a href="{{ url_for('public.oai_pmh') }}" target="_blank">OAI-PMH XML Feed</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support &amp; Legal</h4>
+                <ul>
+                    <li><a href="{{ url_for('public.contact') }}">Contact Us</a></li>
+                    <li><a href="{{ url_for('public.terms') }}">Terms of Service &amp; Agreement</a></li>
+                    <li><a href="{{ url_for('public.privacy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ url_for('public.verify_lookup') }}">Verify QR Code</a></li>
                 </ul>
             </div>
         </div>
+
         <div class="footer-bottom">
-            <p>&copy; 2026 ScholarForge. All rights reserved.</p>
+            <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 0;">
+                <p>&copy; 2026 ScholarForge. Built for Academic Excellence. All rights reserved.</p>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="btn" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-color: rgba(255,255,255,0.2); color: #94a3b8; background: transparent;">
+                    ↑ Back to top
+                </button>
+            </div>
         </div>
     </footer>
 
@@ -101,11 +151,33 @@
             const navLinks = document.getElementById('nav-links');
             const navSearch = document.getElementById('nav-search');
 
+            function toggleMenu() {
+                const isActive = hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                if (navSearch) navSearch.classList.toggle('active');
+                hamburger.setAttribute('aria-expanded', isActive);
+            }
+
             if (hamburger) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    navLinks.classList.toggle('active');
-                    navSearch.classList.toggle('active');
+                hamburger.addEventListener('click', toggleMenu);
+                hamburger.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleMenu();
+                    }
+                });
+
+                // Auto-close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (navLinks.classList.contains('active') &&
+                        !hamburger.contains(e.target) &&
+                        !navLinks.contains(e.target) &&
+                        (!navSearch || !navSearch.contains(e.target))) {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                        if (navSearch) navSearch.classList.remove('active');
+                        hamburger.setAttribute('aria-expanded', 'false');
+                    }
                 });
             }
         });

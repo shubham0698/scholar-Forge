@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 850px; margin-top: 2rem; padding: 3rem 2.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 2rem;">🛡️</span>
+        <h1 style="font-size: 2.1rem; margin-bottom: 0;">ScholarForge Privacy Policy</h1>
+    </div>
+    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Effective Date: January 1, 2026 | Last Updated: August 2026</p>
+    <hr>
+
+    <div style="font-size: 0.95rem; line-height: 1.8; color: var(--text-secondary);">
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">1. Introduction &amp; Scope</h3>
+            <p>
+                ScholarForge ("we", "our", or "the Platform") is committed to protecting the privacy and personal data of our academic community, including student researchers, faculty guides, peer reviewers, and university administrators. This Privacy Policy outlines how we collect, process, store, and safeguard your personal information and research submissions when you access our open-access platform.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">2. Information We Collect</h3>
+            <p style="margin-bottom: 0.5rem;">We collect information necessary to provide academic publishing, peer review, and digital certification services:</p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li style="margin-bottom: 0.4rem;"><strong>Account Profile Data:</strong> Full name, academic email address, selected role (Student, Guide, Reviewer), institution/college name, and academic department.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Research Submissions:</strong> Uploaded manuscript PDF files, titles, abstracts, domain keywords, guide details, and contributor affiliations.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Digital Certificate Records:</strong> Unique Certificate IDs, QR verification links, issue dates, and Digital Object Identifiers (DOIs).</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Analytics &amp; Readership Metrics:</strong> Aggregated paper views, PDF downloads, category performance, and technical log data.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">3. How We Use Your Information</h3>
+            <p style="margin-bottom: 0.5rem;">Your data is used strictly for legitimate academic and platform operations:</p>
+            <ul style="margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.4rem;">Facilitating peer review evaluations and plagiarism similarity checks.</li>
+                <li style="margin-bottom: 0.4rem;">Generating cryptographically verifiable digital PDF certificates with QR codes.</li>
+                <li style="margin-bottom: 0.4rem;">Indexing open-access research via standard OAI-PMH XML metadata protocols.</li>
+                <li style="margin-bottom: 0.4rem;">Sending account verification codes (OTP) and editorial status notifications.</li>
+                <li style="margin-bottom: 0.4rem;">Maintaining platform security and preventing unauthorized access or plagiarism.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">4. Open Access &amp; Data Sharing</h3>
+            <p>
+                ScholarForge is an open-access academic repository. Papers marked as "Public" and approved by peer review are made publicly accessible worldwide under author copyright. We <strong>do not sell, rent, or trade</strong> your personal information or contact details to third-party advertisers.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">5. Data Security &amp; Storage</h3>
+            <p>
+                We implement industry-standard administrative, physical, and technical safeguards. All user passwords are encrypted using secure <code>pbkdf2:sha256</code> hashing algorithms. Database records and certificate files are maintained in secure data environments.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">6. Your Rights &amp; Choices</h3>
+            <p style="margin-bottom: 0.5rem;">As a registered author or reviewer, you have the right to:</p>
+            <ul style="margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.4rem;">Access and update your profile information via the Dashboard.</li>
+                <li style="margin-bottom: 0.4rem;">Toggle manuscript visibility between Public and Private.</li>
+                <li style="margin-bottom: 0.4rem;">Request complete deletion of your account and associated private drafts.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">7. Contact Information</h3>
+            <p>
+                If you have questions regarding this Privacy Policy or data processing practices, please contact our Editorial Support team at <a href="mailto:support@scholarforge.com">support@scholarforge.com</a> or visit our <a href="{{ url_for('public.contact') }}">Contact Page</a>.
+            </p>
+        </section>
+    </div>
+
+    <hr style="margin: 2.5rem 0 1.5rem;">
+    <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('public.terms') }}" class="btn">View Terms of Service &rarr;</a>
+        <a href="{{ url_for('public.index') }}" class="btn btn-primary">&larr; Back to Home</a>
+    </div>
+</div>
+{% endblock %}

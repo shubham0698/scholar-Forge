@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service & User Agreement — ScholarForge{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 850px; margin-top: 2rem; padding: 3rem 2.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 2rem;">📜</span>
+        <h1 style="font-size: 2.1rem; margin-bottom: 0;">Terms of Service &amp; User Agreement</h1>
+    </div>
+    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Effective Date: January 1, 2026 | Last Updated: August 2026</p>
+    <hr>
+
+    <div style="font-size: 0.95rem; line-height: 1.8; color: var(--text-secondary);">
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">1. Acceptance of Terms &amp; Agreement</h3>
+            <p>
+                By creating an account, registering as an Author, Guide, or Peer Reviewer, or submitting any research manuscript to ScholarForge ("Platform"), you acknowledge that you have read, understood, and agreed to be bound by these Terms of Service and User Agreement ("Agreement"). If you do not agree to all terms contained herein, you may not register or access the Platform.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">2. User Registration &amp; Account Responsibility</h3>
+            <ul style="margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.4rem;"><strong>Accuracy:</strong> Users agree to provide true, accurate, and current information, including their real full name, academic affiliation, and valid email address.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Account Security:</strong> You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Verification:</strong> Registration requires email OTP verification. Accounts failing verification remain restricted from publishing.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">3. Intellectual Property Rights &amp; Copyright Retention</h3>
+            <p style="margin-bottom: 0.5rem;">
+                ScholarForge respects original academic research and author copyright:
+            </p>
+            <ul style="margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.4rem;"><strong>Author Copyright:</strong> Authors retain 100% full copyright ownership of all manuscripts, data, and intellectual property submitted to ScholarForge.</li>
+                <li style="margin-bottom: 0.4rem;"><strong>Grant of Publishing License:</strong> By submitting a paper for public release, you grant ScholarForge a non-exclusive, worldwide, royalty-free license to host, display, format, mint DOIs, generate QR certificates, and distribute the manuscript via open-access channels and OAI-PMH metadata feeds.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">4. Academic Integrity &amp; Anti-Plagiarism Policy</h3>
+            <p style="margin-bottom: 0.5rem;">
+                ScholarForge maintains strict academic standards. By submitting a paper, you warrant that:
+            </p>
+            <ul style="margin-left: 1.5rem;">
+                <li style="margin-bottom: 0.4rem;">The submission is your own original research work and does not infringe upon third-party intellectual property rights.</li>
+                <li style="margin-bottom: 0.4rem;">The manuscript has not been fabricated, falsified, or plagiarized. Submissions undergo automated plagiarism checks. Manuscripts with similarity scores exceeding 20% will be rejected or returned for revision.</li>
+                <li style="margin-bottom: 0.4rem;">All co-authors and faculty guides listed in the submission have consented to attribution.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">5. Peer Review &amp; Editorial Conduct</h3>
+            <p>
+                Peer reviewers agree to evaluate assigned manuscripts objectively, impartially, and confidentially on a 1–5 scoring scale. Reviewers must disclose any conflicts of interest and refrain from using unpublished manuscript content for personal or research gain.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">6. Digital Certificates &amp; Verification Validity</h3>
+            <p>
+                ScholarForge issues PDF certificates with cryptographically verifiable QR codes for approved publications. Certificates are tied to specific Publication IDs. Any attempt to alter, forge, or tamper with certificates or verification URLs constitutes a violation of this Agreement and results in immediate account revocation.
+            </p>
+        </section>
+
+        <section style="margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">7. Termination &amp; Account Suspension</h3>
+            <p>
+                ScholarForge reserves the right to suspend or terminate user accounts, revoke publication certificates, or remove content at its sole discretion if a user violates these Terms of Service or engages in fraudulent academic behavior.
+            </p>
+        </section>
+
+        <section>
+            <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">8. Contact &amp; Legal Notices</h3>
+            <p>
+                For legal inquiries, copyright notices, or questions regarding these terms, please contact our Editorial Office at <a href="mailto:legal@scholarforge.com">legal@scholarforge.com</a> or visit our <a href="{{ url_for('public.contact') }}">Contact Page</a>.
+            </p>
+        </section>
+    </div>
+
+    <hr style="margin: 2.5rem 0 1.5rem;">
+    <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('public.privacy') }}" class="btn">View Privacy Policy &rarr;</a>
+        <a href="{{ url_for('public.index') }}" class="btn btn-primary">&larr; Back to Home</a>
+    </div>
+</div>
+{% endblock %}

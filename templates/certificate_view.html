@@ -31,19 +31,19 @@
             </div>
             <div class="profile-row">
                 <span class="profile-label">Verification Link</span>
-                <span class="profile-value">
-                    <a href="{{ url_for('verify_certificate', certificate_id=certificate.certificate_id) }}">
-                        {{ url_for('verify_certificate', certificate_id=certificate.certificate_id, _external=True) }}
+                <span class="profile-value" style="word-break: break-all;">
+                    <a href="{{ url_for('public.verify_certificate', certificate_id=certificate.certificate_id) }}">
+                        {{ url_for('public.verify_certificate', certificate_id=certificate.certificate_id, _external=True) }}
                     </a>
                 </span>
             </div>
         </div>
 
         <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ url_for('download_certificate', certificate_id=certificate.certificate_id) }}" class="btn btn-primary">
+            <a href="{{ url_for('payments.download_certificate', certificate_id=certificate.certificate_id) }}" class="btn btn-primary">
                 📥 Download Certificate PDF
             </a>
-            <a href="{{ url_for('verify_certificate', certificate_id=certificate.certificate_id) }}" class="btn" target="_blank">
+            <a href="{{ url_for('public.verify_certificate', certificate_id=certificate.certificate_id) }}" class="btn" target="_blank">
                 🔗 View Public Verification
             </a>
         </div>

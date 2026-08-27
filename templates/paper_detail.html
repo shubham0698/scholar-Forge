@@ -1,74 +1,394 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ paper.title }} — ScholarForge{% endblock %}
+{% block title %}{{ paper.title }} by {{ paper.author.username }} — ScholarForge{% endblock %}
+
+{% block meta %}
+<!-- Google Scholar Highwire Press Meta Tags -->
+<meta name="citation_title" content="{{ paper.title }}">
+<meta name="citation_author" content="{{ paper.author.username }}">
+<meta name="citation_publication_date" content="{{ paper.created_at.strftime('%Y/%m/%d') }}">
+<meta name="citation_journal_title" content="ScholarForge Academic Open Access Repository">
+<meta name="citation_abstract_html_url" content="{{ request.url }}">
+{% if paper.file_path %}
+<meta name="citation_pdf_url" content="{{ url_for('papers.view_pdf', id=paper.id, _external=True) }}">
+{% endif %}
+<meta name="citation_keywords" content="{{ paper.keywords }}">
+{% if paper.doi %}
+<meta name="citation_doi" content="{{ paper.doi }}">
+{% endif %}
+
+<!-- Open Graph (OG) Article Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ paper.title }}">
+<meta property="og:description" content="{{ paper.abstract[:250] }}">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="article:published_time" content="{{ paper.created_at.isoformat() }}">
+<meta property="article:author" content="{{ paper.author.username }}">
+<meta property="article:section" content="{{ paper.category }}">
+<meta property="article:tag" content="{{ paper.keywords }}">
+
+<!-- Standard Search Engine Meta Tags -->
+<meta name="description" content="{{ paper.title }} — Research paper by {{ paper.author.username }}{% if paper.author.institution %} ({{ paper.author.institution }}){% endif %}. {{ paper.abstract[:200] }}">
+<meta name="keywords" content="{{ paper.keywords }}, {{ paper.title }}, {{ paper.author.username }}, {{ paper.category }}, ScholarForge research paper">
+<link rel="canonical" href="{{ request.url }}">
+
+<!-- JSON-LD Structured Data Schema for Google Search Rich Results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": {{ paper.title|tojson }},
+  "name": {{ paper.title|tojson }},
+  "description": {{ paper.abstract|tojson }},
+  "author": {
+    "@type": "Person",
+    "name": {{ paper.author.username|tojson }},
+    "affiliation": {
+      "@type": "Organization",
+      "name": {{ (paper.author.institution or "ScholarForge Academic Community")|tojson }}
+    }
+  },
+  "datePublished": "{{ paper.created_at.strftime('%Y-%m-%d') }}",
+  "keywords": {{ paper.keywords|tojson }},
+  "publisher": {
+    "@type": "Organization",
+    "name": "ScholarForge Academic Open Access Repository",
+    "url": "{{ url_for('public.index', _external=True) }}"
+  },
+  "mainEntityOfPage": "{{ request.url }}"
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="page-header" style="margin-bottom: 1.5rem;">
-    <span class="badge">{{ paper.category }}</span>
-    <h2>{{ paper.title }}</h2>
-    <div class="paper-meta">
-        <span>👤 {{ paper.author.username }}</span>
-        <span>📅 {{ paper.created_at.strftime('%B %d, %Y') }}</span>
+<!-- Breadcrumb Navigation -->
+<nav style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <a href="{{ url_for('public.index') }}" style="color: var(--text-secondary);">Home</a> &rsaquo;
+    <a href="{{ url_for('public.explore') }}" style="color: var(--text-secondary);">Explore</a> &rsaquo;
+    <a href="{{ url_for('public.explore', category=paper.category) }}" style="color: var(--primary); font-weight: 600;">{{ paper.category }}</a> &rsaquo;
+    <span class="text-muted">Manuscript #{{ paper.publication_id or paper.id }}</span>
+</nav>
+
+<!-- Main Reader Hero Banner -->
+<div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), var(--bg-card)); border-color: rgba(99, 102, 241, 0.2); padding: 2rem 2.25rem;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <span class="badge badge-success">🔓 Open Access</span>
+        <span class="badge" style="background: var(--primary); color: white;">🏷️ {{ paper.category }}</span>
         {% if paper.publication_id %}
-        <span class="badge badge-success" style="margin-bottom: 0;">ID: {{ paper.publication_id }}</span>
+        <span class="badge" style="background: rgba(255,255,255,0.8); color: var(--text-primary); border: 1px solid var(--border);">🆔 {{ paper.publication_id }}</span>
+        {% endif %}
+    </div>
+
+    <h1 style="font-size: 2.1rem; line-height: 1.35; margin-bottom: 1.25rem; color: var(--text-primary);">{{ paper.title }}</h1>
+
+    <!-- Authors & Affiliations Row -->
+    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-light);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+                {{ paper.author.username[0]|upper }}
+            </div>
+            <div>
+                <strong style="font-size: 1rem; color: var(--text-primary);">{{ paper.author.username }}</strong>
+                {% if paper.author.institution %}
+                <div class="text-secondary" style="font-size: 0.85rem;">{{ paper.author.institution }} {% if paper.author.department %}• {{ paper.author.department }}{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="font-size: 0.88rem; color: var(--text-secondary); margin-left: auto;">
+            📅 Published: <strong>{{ paper.created_at.strftime('%B %d, %Y') }}</strong>
+        </div>
+    </div>
+
+    <!-- Quick Action Bar -->
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        {% if paper.file_path %}
+        <a href="{{ url_for('papers.download_pdf', id=paper.id) }}" class="btn btn-primary" style="padding: 0.75rem 1.6rem; font-size: 0.95rem; font-weight: 600;">
+            📥 Download PDF ({{ paper.downloads_count or 0 }})
+        </a>
+        <a href="#pdf-viewer-section" class="btn" style="padding: 0.75rem 1.25rem; font-size: 0.95rem;">
+            📄 Read Full Manuscript
+        </a>
+        {% endif %}
+
+        <button onclick="document.getElementById('citation-section').scrollIntoView({behavior: 'smooth'});" class="btn btn-accent" style="padding: 0.75rem 1.25rem; font-size: 0.95rem;">
+            📑 Cite Article
+        </button>
+
+        {% if paper.certificate %}
+        <a href="{{ url_for('public.verify_certificate', certificate_id=paper.certificate.certificate_id) }}" class="btn" style="padding: 0.75rem 1.25rem; font-size: 0.95rem; border-color: var(--success); color: var(--success);" target="_blank">
+            🎓 Verified QR Certificate
+        </a>
+        {% endif %}
+
+        {% if current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin) %}
+        <a href="{{ url_for('papers.edit_paper', id=paper.id) }}" class="btn" style="padding: 0.75rem 1.25rem; font-size: 0.95rem; margin-left: auto;">
+            ✏️ Edit Paper
+        </a>
         {% endif %}
     </div>
 </div>
 
+<!-- Status Notice Banners -->
+{% if paper.status == 'pending' %}
+<div style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-size: 0.95rem; color: var(--text-primary);">
+    ⏳ <strong>In Verification Phase:</strong> This research paper is currently undergoing peer review and editorial verification by ScholarForge editors. The author will be notified via email once approved.
+</div>
+{% elif paper.status == 'rejected' %}
+<div style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid var(--danger); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-size: 0.95rem; color: var(--text-primary);">
+    ❌ <strong>Rejection Notice &amp; Editorial Feedback:</strong>
+    <p style="margin: 0.4rem 0 0 0; font-style: italic; color: var(--danger); font-weight: 500;">
+        "{{ paper.rejection_reason or 'Does not meet current editorial quality standards or guidelines.' }}"
+    </p>
+</div>
+{% endif %}
+
+<!-- 2-Column Main Layout Grid -->
 <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-    <div style="flex: 3; min-width: 300px;">
-        <div class="card" style="margin-bottom: 2rem;">
-            <h3 class="mb-2">Abstract</h3>
-            <p style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.8;">{{ paper.abstract }}</p>
+    <!-- Left Main Article Content (70%) -->
+    <div style="flex: 2.8; min-width: 300px; width: 100%;">
+        
+        <!-- Embedded Interactive PDF Reader Section (Displayed First at Top) -->
+        <div id="pdf-viewer-section" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <h3 style="margin: 0; font-size: 1.25rem;">📄 Interactive PDF Manuscript Reader</h3>
+                {% if paper.file_path %}
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{{ url_for('papers.view_pdf', id=paper.id) }}" class="btn" style="padding: 0.4rem 0.85rem; font-size: 0.82rem;" target="_blank">↗️ Open in New Tab</a>
+                    <a href="{{ url_for('papers.download_pdf', id=paper.id) }}" class="btn btn-primary" style="padding: 0.4rem 0.85rem; font-size: 0.82rem;">📥 Download PDF</a>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if paper.file_path %}
+            <div style="width: 100%; height: 780px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); background: #525659;">
+                <iframe src="{{ url_for('papers.view_pdf', id=paper.id) }}#toolbar=1" style="width: 100%; height: 100%; border: none;" title="{{ paper.title }}"></iframe>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding: 3rem 1rem;">
+                <div class="empty-state-icon">📁</div>
+                <h4>PDF File Not Attached</h4>
+                <p class="text-secondary">No PDF manuscript file is attached to this paper entry.</p>
+            </div>
+            {% endif %}
         </div>
 
-        {% if contributors %}
-        <div class="card">
-            <h3 class="mb-2">Contributors</h3>
-            <ul>
-                {% for c in contributors %}
-                <li><strong>{{ c.name }}</strong> ({{ c.role }}) - {{ c.affiliation }}</li>
+        <!-- Abstract Card -->
+        <div class="card" style="margin-bottom: 2rem; padding: 2rem;">
+            <h3 style="font-size: 1.35rem; margin-bottom: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; display: inline-block;">Abstract</h3>
+            <p style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.85; color: var(--text-secondary);">{{ paper.abstract }}</p>
+        </div>
+
+        <!-- Research Keywords -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.85rem;">🏷️ Indexing Keywords &amp; Topics</h3>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% for kw in paper.keywords.split(',') %}
+                <span class="badge" style="background: rgba(99, 102, 241, 0.08); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); padding: 0.4rem 0.85rem; font-size: 0.85rem;">
+                    {{ kw.strip() }}
+                </span>
                 {% endfor %}
-            </ul>
+            </div>
+        </div>
+
+        <!-- Authors, Guides & Contributors Roster Card -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1.25rem;">👥 Authors &amp; Academic Affiliations</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Primary Author -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <span class="badge badge-success" style="margin-bottom: 0.35rem;">Lead Author</span>
+                        <h4 style="margin: 0; font-size: 1.05rem;">{{ paper.author.username }}</h4>
+                        <p class="text-secondary" style="margin: 0.2rem 0 0 0; font-size: 0.88rem;">
+                            {{ paper.author.institution or 'Independent Researcher' }} {% if paper.author.department %}({{ paper.author.department }}){% endif %}
+                        </p>
+                    </div>
+                    <span class="text-muted" style="font-size: 0.85rem;">📧 {{ paper.author.email }}</span>
+                </div>
+
+                <!-- Faculty Guide (if present) -->
+                {% if guide %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <span class="badge" style="background: var(--accent); color: white; margin-bottom: 0.35rem;">Faculty Supervisor / Guide</span>
+                        <h4 style="margin: 0; font-size: 1.05rem;">{{ guide.name }}</h4>
+                        <p class="text-secondary" style="margin: 0.2rem 0 0 0; font-size: 0.88rem;">
+                            {{ guide.designation or 'Faculty' }} • {{ guide.institution or 'N/A' }} {% if guide.department %}({{ guide.department }}){% endif %}
+                        </p>
+                    </div>
+                    <span class="badge badge-success">Verified Mentor</span>
+                </div>
+                {% endif %}
+
+                <!-- Co-Authors & Contributors (if present) -->
+                {% if contributors %}
+                {% for c in contributors %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1rem; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <span class="badge" style="margin-bottom: 0.25rem;">Co-Author / {{ c.role }}</span>
+                        <h4 style="margin: 0; font-size: 0.98rem;">{{ c.name }}</h4>
+                        <p class="text-secondary" style="margin: 0.15rem 0 0 0; font-size: 0.85rem;">{{ c.affiliation or 'N/A' }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Right Journal Sidebar (30%) -->
+    <div style="flex: 1; min-width: 280px; width: 100%;">
+        
+        <!-- Article Metrics Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">📊 Article Performance</h3>
+            
+            <div class="profile-row" style="padding: 0.6rem 0;">
+                <span class="profile-label">👁️ Total Views</span>
+                <span class="profile-value" style="font-weight: 700;">{{ paper.views_count or 0 }}</span>
+            </div>
+            <div class="profile-row" style="padding: 0.6rem 0;">
+                <span class="profile-label">📥 PDF Downloads</span>
+                <span class="profile-value" style="font-weight: 700; color: var(--accent);">{{ paper.downloads_count or 0 }}</span>
+            </div>
+            {% if paper.plagiarism_score is not none %}
+            <div class="profile-row" style="padding: 0.6rem 0;">
+                <span class="profile-label">🔍 Similarity Index</span>
+                <span class="profile-value {% if paper.plagiarism_score <= 15 %}text-success{% else %}text-warning{% endif %}" style="font-weight: 700;">
+                    {{ paper.plagiarism_score }}% (Passed)
+                </span>
+            </div>
+            {% endif %}
+            {% if paper.doi %}
+            <div class="profile-row" style="padding: 0.6rem 0;">
+                <span class="profile-label">🔗 DOI Reference</span>
+                <span class="profile-value" style="font-size: 0.8rem; word-break: break-all;">
+                    <a href="https://doi.org/{{ paper.doi }}" target="_blank">{{ paper.doi }}</a>
+                </span>
+            </div>
+            {% endif %}
+            <div class="profile-row" style="padding: 0.6rem 0;">
+                <span class="profile-label">🌐 Indexing Status</span>
+                <span class="profile-value text-success" style="font-weight: 600;">OAI-PMH Ready</span>
+            </div>
+        </div>
+
+        <!-- Interactive Citation Generator Card -->
+        <div id="citation-section" class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">📑 Cite This Publication</h3>
+            <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 0.75rem;">Select citation style format:</p>
+            
+            <div style="display: flex; gap: 0.35rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+                <button onclick="changeCitation('apa')" id="btn-apa" class="btn" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; font-weight: 600;">APA 7</button>
+                <button onclick="changeCitation('mla')" id="btn-mla" class="btn" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; font-weight: 600;">MLA 9</button>
+                <button onclick="changeCitation('harvard')" id="btn-harvard" class="btn" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; font-weight: 600;">Harvard</button>
+                <button onclick="changeCitation('bibtex')" id="btn-bibtex" class="btn" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; font-weight: 600;">BibTeX</button>
+            </div>
+
+            <div id="citation-box" style="background: var(--bg-body); padding: 0.85rem; border-radius: var(--radius-sm); font-size: 0.82rem; font-family: monospace; word-break: break-all; max-height: 160px; overflow-y: auto; border: 1px solid var(--border); margin-bottom: 0.75rem; line-height: 1.6;">
+                Generating citation...
+            </div>
+
+            <button onclick="copyCitation()" id="copy-btn" class="btn btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.85rem; font-weight: 600;">
+                📋 Copy Citation to Clipboard
+            </button>
+        </div>
+
+        <!-- Digital Verification Widget -->
+        {% if paper.certificate %}
+        <div class="card" style="margin-bottom: 1.5rem; border-color: rgba(16, 185, 129, 0.3); background: linear-gradient(135deg, rgba(16, 185, 129, 0.04), var(--bg-card));">
+            <span class="badge badge-success" style="margin-bottom: 0.5rem;">🎓 Verified Publication</span>
+            <h4 style="margin-bottom: 0.5rem; font-size: 1rem;">Official QR Certificate</h4>
+            <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 1rem;">
+                This manuscript has earned a tamper-proof digital PDF certificate with cryptographically signed QR code.
+            </p>
+            <a href="{{ url_for('public.verify_certificate', certificate_id=paper.certificate.certificate_id) }}" class="btn btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;" target="_blank">
+                🔍 Verify Certificate #{{ paper.certificate.certificate_id }}
+            </a>
         </div>
         {% endif %}
-    </div>
 
-    <div style="flex: 1; min-width: 250px;">
-        <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 class="mb-2">Metadata</h3>
-            <div class="profile-row" style="padding: 0.5rem 0;">
-                <span class="profile-label">Keywords</span>
-                <span class="profile-value">{{ paper.keywords }}</span>
+        <!-- Share Manuscript Card -->
+        <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.85rem;">🔗 Share Research</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button onclick="copyPageUrl()" class="btn" style="width: 100%; font-size: 0.85rem; text-align: left; padding: 0.5rem 0.85rem;">
+                    🔗 Copy Page URL
+                </button>
+                <a href="mailto:?subject={{ paper.title|urlencode }}&body=Check%20out%20this%20research%20paper%20on%20ScholarForge:%20{{ request.url|urlencode }}" class="btn" style="width: 100%; font-size: 0.85rem; text-align: left; padding: 0.5rem 0.85rem;">
+                    ✉️ Share via Email
+                </a>
             </div>
-            {% if guide %}
-            <div class="profile-row" style="padding: 0.5rem 0;">
-                <span class="profile-label">Guide</span>
-                <span class="profile-value">{{ guide.name }} ({{ guide.designation }})</span>
-            </div>
-            <div class="profile-row" style="padding: 0.5rem 0;">
-                <span class="profile-label">Institution</span>
-                <span class="profile-value">{{ guide.institution }}</span>
-            </div>
-            {% endif %}
         </div>
 
-        <div class="card text-center">
-            {% if paper.file_path %}
-                <a href="{{ url_for('view_pdf', id=paper.id) }}" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" target="_blank">📄 View PDF</a>
-            {% else %}
-                <p class="text-muted mb-2">No PDF available</p>
-            {% endif %}
-            
-            {% if paper.certificate %}
-                <a href="{{ url_for('verify_certificate', certificate_id=paper.certificate.certificate_id) }}" class="btn" style="width: 100%;" target="_blank">🎓 View Certificate</a>
-            {% endif %}
-
-            {% if current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin) %}
-                <hr>
-                <a href="{{ url_for('edit_paper', id=paper.id) }}" class="btn btn-accent" style="width: 100%;">✏️ Edit Paper</a>
-            {% endif %}
-        </div>
     </div>
 </div>
+
+<!-- JavaScript for Citation Generator & Copy Controls -->
+<script>
+    const paperTitle = {{ paper.title|tojson }};
+    const authorName = {{ paper.author.username|tojson }};
+    const pubYear = {{ paper.created_at.year }};
+    const paperDoi = {{ paper.doi|tojson or '""' }};
+    const paperUrl = window.location.href;
+
+    const citations = {
+        apa: `${authorName}. (${pubYear}). ${paperTitle}. ScholarForge Journal of Research. ${paperDoi ? 'https://doi.org/' + paperDoi : paperUrl}`,
+        mla: `${authorName}. "${paperTitle}." ScholarForge, ${pubYear}${paperDoi ? ', doi:' + paperDoi : ', ' + paperUrl}.`,
+        harvard: `${authorName}, ${pubYear}. ${paperTitle}. ScholarForge. Available at: ${paperUrl} [Accessed ${new Date().toLocaleDateString()}].`,
+        bibtex: `@article{scholarforge_${pubYear}_${authorName.toLowerCase().replace(/[^a-z0-9]/g, '')},\n  author = {${authorName}},\n  title = {${paperTitle}},\n  journal = {ScholarForge Academic Repository},\n  year = {${pubYear}},\n  ${paperDoi ? 'doi = {' + paperDoi + '},\n  ' : ''}url = {${paperUrl}}\n}`
+    };
+
+    let activeCitation = 'apa';
+
+    function changeCitation(format) {
+        activeCitation = format;
+        const box = document.getElementById('citation-box');
+        box.innerText = citations[format];
+        
+        ['apa', 'mla', 'harvard', 'bibtex'].forEach(f => {
+            const btn = document.getElementById('btn-' + f);
+            if (btn) {
+                if (f === format) {
+                    btn.style.background = 'var(--primary)';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = 'var(--primary)';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.style.borderColor = 'var(--border)';
+                }
+            }
+        });
+    }
+
+    function copyCitation() {
+        const text = citations[activeCitation];
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('copy-btn');
+            const orig = btn.innerText;
+            btn.innerText = '✅ Copied to Clipboard!';
+            btn.style.background = 'var(--success)';
+            setTimeout(() => {
+                btn.innerText = orig;
+                btn.style.background = 'var(--primary)';
+            }, 2200);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
+    }
+
+    function copyPageUrl() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Publication page URL copied to clipboard!');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        changeCitation('apa');
+    });
+</script>
 {% endblock %}

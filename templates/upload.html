@@ -7,7 +7,7 @@
     <h2>Upload Research Paper</h2>
     <hr>
     
-    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('papers.upload') }}" enctype="multipart/form-data">
         <h3 class="mb-2">Paper Metadata</h3>
         <div class="form-group">
             <label for="title">Paper Title</label>
@@ -60,16 +60,16 @@
         <h3 class="mt-4 mb-2">Contributors (Optional)</h3>
         <p class="text-muted mb-2" style="font-size: 0.85rem;">Add other researchers who contributed to this paper.</p>
         <div id="contributors-container">
-            <div class="contributor-row gap-row" style="margin-bottom: 0.5rem; align-items: flex-end;">
-                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+            <div class="contributor-row gap-row" style="margin-bottom: 0.75rem;">
+                <div class="form-group" style="flex: 2;">
                     <label>Name</label>
                     <input type="text" name="contributor_name[]" class="form-control" placeholder="Jane Doe">
                 </div>
-                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                <div class="form-group" style="flex: 2;">
                     <label>Role</label>
                     <input type="text" name="contributor_role[]" class="form-control" placeholder="e.g. Data Analysis">
                 </div>
-                <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                <div class="form-group" style="flex: 2;">
                     <label>Affiliation</label>
                     <input type="text" name="contributor_affiliation[]" class="form-control" placeholder="University Name">
                 </div>
@@ -93,19 +93,21 @@ function addContributor() {
     const container = document.getElementById('contributors-container');
     const newRow = document.createElement('div');
     newRow.className = 'contributor-row gap-row';
-    newRow.style.marginBottom = '0.5rem';
-    newRow.style.alignItems = 'flex-end';
+    newRow.style.marginBottom = '0.75rem';
     newRow.innerHTML = `
-        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+        <div class="form-group" style="flex: 2;">
+            <label class="mobile-only-label" style="display:none;">Name</label>
             <input type="text" name="contributor_name[]" class="form-control" placeholder="Name">
         </div>
-        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+        <div class="form-group" style="flex: 2;">
+            <label class="mobile-only-label" style="display:none;">Role</label>
             <input type="text" name="contributor_role[]" class="form-control" placeholder="Role">
         </div>
-        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+        <div class="form-group" style="flex: 2;">
+            <label class="mobile-only-label" style="display:none;">Affiliation</label>
             <input type="text" name="contributor_affiliation[]" class="form-control" placeholder="Affiliation">
         </div>
-        <button type="button" class="btn btn-danger" style="padding: 0.6rem 0.8rem; height: 100%;" onclick="this.parentElement.remove()">X</button>
+        <button type="button" class="btn btn-danger" style="padding: 0.6rem 0.8rem; min-height: 40px;" onclick="this.parentElement.remove()">Remove</button>
     `;
     container.appendChild(newRow);
 }

@@ -24,9 +24,9 @@
                 <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 1rem;">Issued: {{ cert.issue_date.strftime('%b %d, %Y') }}</p>
                 <p class="text-muted" style="font-size: 0.8rem; font-family: monospace; margin-bottom: 1rem;">ID: {{ cert.certificate_id }}</p>
             </div>
-            <div class="paper-actions" style="margin-top: auto; display: flex; flex-direction: row; gap: 0.5rem; width: 100%;">
-                <a href="{{ url_for('download_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-primary" style="flex: 1;">Download</a>
-                <a href="{{ url_for('verify_certificate', certificate_id=cert.certificate_id) }}" class="btn" style="flex: 1;" target="_blank">View</a>
+            <div class="paper-actions" style="margin-top: auto; display: flex; flex-direction: row; gap: 0.5rem; width: 100%; flex-wrap: wrap;">
+                <a href="{{ url_for('payments.download_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-primary" style="flex: 1 1 120px;">Download</a>
+                <a href="{{ url_for('public.verify_certificate', certificate_id=cert.certificate_id) }}" class="btn" style="flex: 1 1 120px;" target="_blank">View</a>
             </div>
         </div>
     {% endfor %}
@@ -36,7 +36,7 @@
         <div class="empty-state-icon">🎓</div>
         <h3>No certificates yet</h3>
         <p>You haven't earned any certificates. Publish a paper to get started!</p>
-        <a href="{{ url_for('upload') }}" class="btn btn-primary">Publish Paper</a>
+        <a href="{{ url_for('papers.upload') }}" class="btn btn-primary">Publish Paper</a>
     </div>
 {% endif %}
 {% endblock %}

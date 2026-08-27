@@ -57,6 +57,12 @@
             </div>
         </div>
 
+        <div style="margin-top: 2rem;">
+            <a href="{{ url_for('public.public_download_certificate', certificate_id=certificate.certificate_id) }}" class="btn btn-primary" style="padding: 0.75rem 1.6rem; font-weight: 600;">
+                📥 Download Official PDF Certificate
+            </a>
+        </div>
+
         {% if certificate.qr_code_path %}
         <div style="margin-top: 2rem;">
             <img src="{{ url_for('static', filename=certificate.qr_code_path.replace('static/', '').replace('static\\\\', '')) }}" alt="QR Code" style="width: 120px; height: 120px; border-radius: 8px;">

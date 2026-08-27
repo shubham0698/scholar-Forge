@@ -11,15 +11,18 @@
 {% if results %}
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
     {% for paper in results %}
-        <div class="paper-card">
-            <div>
-                <h3><a href="{{ url_for('paper_detail', id=paper.id) }}">{{ paper.title }}</a></h3>
+        <div class="paper-card" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 240px;">
+                <h3 style="margin-bottom: 0.35rem;"><a href="{{ url_for('public.paper_detail', id=paper.id) }}">{{ paper.title }}</a></h3>
                 <span class="badge">{{ paper.category }}</span>
-                <p class="text-secondary" style="font-size: 0.92rem;">{{ paper.abstract[:200] }}...</p>
+                <p class="text-secondary" style="font-size: 0.92rem; margin: 0.5rem 0 1rem;">{{ paper.abstract[:200] }}...</p>
                 <div class="paper-meta">
                     <span>👤 {{ paper.author.username }}</span>
                     <span>📅 {{ paper.created_at.strftime('%b %d, %Y') }}</span>
                 </div>
+            </div>
+            <div style="min-width: 140px;">
+                <a href="{{ url_for('public.paper_detail', id=paper.id) }}" class="btn btn-primary" style="width: 100%; text-align: center; font-size: 0.85rem;">📖 Read Paper</a>
             </div>
         </div>
     {% endfor %}

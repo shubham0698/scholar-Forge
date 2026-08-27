@@ -18,15 +18,23 @@
   - [x] Create Dashboard (`dashboard.html`)
   - [x] Implement Paper Upload form (`upload.html`)
   - [x] Implement Paper details and metadata saving
-- [ ] Administration & Payments
-  - [ ] Admin panel structure
-  - [ ] Payment page (`payment.html`) placeholder
-- [ ] Certificate Generation (Python)
-  - [ ] Setup `reportlab`, `qrcode`, `Pillow` logic
-  - [ ] Generate Certificate PDF with dynamic data and QR code
-- [ ] Verification System
-  - [ ] Verification Route (`/verify/<id>`)
-  - [ ] Public Verification Page (`verify.html`)
-- [ ] Polish & Final Testing
-  - [ ] Validate responsive design
-  - [ ] Test upload and certificate workflow
+- [x] Administration & Payments
+  - [x] Admin panel structure
+  - [x] Payment page (`payment.html`)
+- [x] Certificate Generation (Python)
+  - [x] Setup `reportlab`, `qrcode`, `Pillow` logic
+  - [x] Generate Certificate PDF with dynamic data and QR code
+- [x] Verification System
+  - [x] Verification Route (`/verify/<id>`)
+  - [x] Public Verification Page (`verify.html`)
+- [x] Advanced Features
+  - [x] Peer Review & Revision Pipeline (Reviews Blueprint & Reviewer Panel)
+  - [x] Analytics & DOI Generation (Views, Downloads, & Crossref simulated DOIs)
+  - [x] OAI-PMH DC XML Feed Endpoint (Metadata harvesting at `/oai`)
+  - [x] Plagiarism Threshold Screening (Mock scans with warning block above 20%)
+  - [x] Co-Author Dashboard Claims (Linking contributor rows to User account profiles)
+  - [x] Admin Role Modification Panels (Quick select dropdowns inside Manage Users)
+  - [x] PDF Version Replacement uploads (Upload updated files via Edit Paper form)
+- [x] Polish & Final Testing
+  - [x] Validate responsive design and styling
+  - [x] Test upload and certificate workflow

@@ -6,7 +6,7 @@
 <div class="form-container">
     <h2>Create an Account</h2>
     <p class="text-secondary mb-3">Join thousands of student researchers worldwide.</p>
-    <form method="POST" action="{{ url_for('register') }}">
+    <form method="POST" action="{{ url_for('auth.register') }}">
         <div class="form-group">
             <label for="username">Full Name (as it appears on certificates)</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Jane Doe" required autofocus>
@@ -34,10 +34,21 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Sign Up</button>
+        
+        <!-- Mandatory Terms and Privacy Policy Agreement Checkbox -->
+        <div class="form-group" style="margin: 1.25rem 0 1.5rem;">
+            <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; font-weight: normal; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                <input type="checkbox" id="agree_terms" name="agree_terms" required style="width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; cursor: pointer;">
+                <span>
+                    I have read and agree to the <a href="{{ url_for('public.terms') }}" target="_blank" style="font-weight: 600; text-decoration: underline;">Terms of Service &amp; User Agreement</a> and <a href="{{ url_for('public.privacy') }}" target="_blank" style="font-weight: 600; text-decoration: underline;">Privacy Policy</a>.
+                </span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account &amp; Register</button>
     </form>
     <p class="text-center mt-3 text-secondary" style="font-size: 0.88rem;">
-        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+        Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
     </p>
 </div>
 {% endblock %}

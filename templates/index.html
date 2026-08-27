@@ -1,64 +1,182 @@
 {% extends 'base.html' %}
 
-{% block title %}ScholarForge — Research Publication Platform{% endblock %}
+{% block title %}ScholarForge — Premier Academic Publishing & Portfolio Platform{% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
 <section class="hero">
     <h1>Publish Your Academic <span>Research</span></h1>
     <p>The premier platform for students to publish papers, receive verifiable certificates, and build a lasting
         academic portfolio.</p>
     <div class="hero-buttons">
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('upload') }}" class="btn btn-primary">Start Publishing</a>
+        <a href="{{ url_for('papers.upload') }}" class="btn btn-primary">Start Publishing</a>
         {% else %}
-        <a href="{{ url_for('register') }}" class="btn btn-primary">Start Publishing</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Start Publishing</a>
         {% endif %}
-        <a href="{{ url_for('explore') }}" class="btn">Explore Papers</a>
+        <a href="{{ url_for('public.explore') }}" class="btn">Explore Papers</a>
     </div>
 </section>
 
-<!-- Stats Section -->
-<div class="card-grid" style="margin-bottom: 5rem;">
-    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
-        <h3 class="text-primary" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_papers }}</h3>
-        <p class="text-secondary font-weight-bold">Published Papers</p>
+<!-- Live Impact Stats Section -->
+<div class="card-grid" style="margin-bottom: 4rem;">
+    <div class="card text-center stats-card-gradient">
+        <div class="card-icon" style="margin: 0 auto 0.75rem;">📄</div>
+        <h3 class="text-primary" style="font-size: 2.4rem; margin-bottom: 0.25rem;">{{ total_papers }}+</h3>
+        <p class="text-secondary font-weight-bold" style="margin-bottom: 0;">Published Manuscripts</p>
     </div>
-    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
-        <h3 class="text-success" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_users }}</h3>
-        <p class="text-secondary font-weight-bold">Researchers Worldwide</p>
+    <div class="card text-center stats-card-gradient">
+        <div class="card-icon" style="margin: 0 auto 0.75rem;">👥</div>
+        <h3 class="text-success" style="font-size: 2.4rem; margin-bottom: 0.25rem;">{{ total_users }}+</h3>
+        <p class="text-secondary font-weight-bold" style="margin-bottom: 0;">Active Researchers</p>
     </div>
-    <div class="card text-center" style="background: linear-gradient(135deg, var(--bg-card), var(--bg-body));">
-        <h3 class="text-accent" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_certs }}</h3>
-        <p class="text-secondary font-weight-bold">Certificates Issued</p>
+    <div class="card text-center stats-card-gradient">
+        <div class="card-icon" style="margin: 0 auto 0.75rem;">🎓</div>
+        <h3 class="text-accent" style="font-size: 2.4rem; margin-bottom: 0.25rem;">{{ total_certs }}+</h3>
+        <p class="text-secondary font-weight-bold" style="margin-bottom: 0;">QR Certificates Issued</p>
     </div>
 </div>
 
+<!-- Featured Publications Showcase -->
+{% if recent_papers %}
+<section style="margin-bottom: 5rem;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <span class="badge badge-success">Latest Additions</span>
+            <h2 style="margin-bottom: 0.25rem;">Featured Research Papers</h2>
+            <p class="text-secondary" style="margin-bottom: 0;">Explore peer-reviewed research papers published recently
+                on ScholarForge.</p>
+        </div>
+        <a href="{{ url_for('public.explore') }}" class="btn" style="font-size: 0.88rem;">Browse All Papers &rarr;</a>
+    </div>
+
+    <div class="card-grid">
+        {% for paper in recent_papers %}
+        <div class="card" style="display: flex; flex-direction: column;">
+            <span class="badge">{{ paper.category }}</span>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; line-height: 1.35;">
+                <a href="{{ url_for('public.paper_detail', id=paper.id) }}">{{ paper.title }}</a>
+            </h3>
+            <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.65;">
+                {{ paper.abstract[:140] }}...
+            </p>
+            <div class="paper-meta"
+                style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-light);">
+                <span>👤 {{ paper.author.username }}</span>
+                <span>📅 {{ paper.created_at.strftime('%b %d, %Y') }}</span>
+                <span>👁️ {{ paper.views_count or 0 }} Views</span>
+            </div>
+            <div style="margin-top: 0.85rem;">
+                <a href="{{ url_for('public.paper_detail', id=paper.id) }}" class="btn btn-primary" style="width: 100%; text-align: center; font-size: 0.85rem; font-weight: 600;">📖 Read Paper</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Why Choose ScholarForge? Feature Pillars Grid -->
 <section class="features-section">
     <h2>Why Choose ScholarForge?</h2>
-    <p>Everything you need to launch your academic career</p>
+    <p>Built for modern student researchers, university mentors, and academic institutions</p>
+
     <div class="card-grid">
         <div class="card">
             <div class="card-icon">📜</div>
-            <h3>Verifiable Certificates</h3>
-            <p>Automatically generate verifiable PDF certificates with unique QR codes for every published paper.</p>
+            <h3>Verifiable Digital Certificates</h3>
+            <p>Automatically generate cryptographically verifiable PDF certificates embedded with unique QR code
+                verification links for every approved manuscript.</p>
         </div>
+
         <div class="card">
-            <div class="card-icon">📁</div>
-            <h3>Academic Portfolio</h3>
-            <p>Build a lasting portfolio that showcases your research, contributions, and mentorship details.</p>
+            <div class="card-icon">🔍</div>
+            <h3>Peer Review & Plagiarism Check</h3>
+            <p>Assigned academic reviewers evaluate submissions on a 1–5 scoring scale with structured constructive
+                feedback and automated plagiarism similarity checks.</p>
         </div>
+
         <div class="card">
-            <div class="card-icon">🔒</div>
-            <h3>Author Ownership</h3>
-            <p>You retain full copyright of your work. We provide the platform and verification infrastructure.</p>
+            <div class="card-icon">📊</div>
+            <h3>Live Author Analytics</h3>
+            <p>Track real-time readership metrics, view counters, PDF downloads, and domain category distributions
+                directly from your personal dashboard.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🔗</div>
+            <h3>DOI Minting & Citations</h3>
+            <p>Generate unique Digital Object Identifiers (DOIs) and instant citation copy tags (APA, MLA, Harvard,
+                BibTeX) for seamless academic referencing.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">👥</div>
+            <h3>Co-Author & Guide Attribution</h3>
+            <p>Acknowledge research mentors, department guides, and co-authors with linkable profile claims and
+                institutional affiliations.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🌐</div>
+            <h3>OAI-PMH Open Access Indexing</h3>
+            <p>Standardized XML metadata endpoints allow Google Scholar, university repositories, and global library
+                catalogs to discover your work.</p>
         </div>
     </div>
 </section>
 
-<!-- Call to action -->
-<section style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center; color: white; margin-bottom: 4rem; box-shadow: var(--shadow-lg);">
-    <h2 style="color: white; margin-bottom: 1rem; font-size: 2.2rem;">Ready to share your research?</h2>
-    <p style="color: rgba(255,255,255,0.8); margin-bottom: 2rem; font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">Join thousands of students building their academic portfolio on ScholarForge today.</p>
-    <a href="{{ url_for('register') }}" class="btn btn-accent" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Create Free Account</a>
+<!-- Simple 3-Step Publishing Workflow -->
+<section style="margin-bottom: 5rem;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h2>Simple 3-Step Publishing Workflow</h2>
+        <p class="text-secondary">From draft manuscript to verifiable publication in days</p>
+    </div>
+
+    <div class="card-grid">
+        <div class="card text-center" style="position: relative;">
+            <div
+                style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                1</div>
+            <h3>Upload Manuscript</h3>
+            <p>Submit your research PDF with abstract, keywords, visibility preferences, and guide details.</p>
+        </div>
+
+        <div class="card text-center" style="position: relative;">
+            <div
+                style="width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: white; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                2</div>
+            <h3>Peer Review & Scoring</h3>
+            <p>Expert reviewers score your paper, check plagiarism scores, and provide constructive editorial guidance.
+            </p>
+        </div>
+
+        <div class="card text-center" style="position: relative;">
+            <div
+                style="width: 48px; height: 48px; border-radius: 50%; background: var(--success); color: white; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                3</div>
+            <h3>Certify & Share</h3>
+            <p>Upon approval, receive your official QR PDF certificate and share your public DOI link worldwide.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="cta-banner">
+    <h2 style="font-size: 2.4rem; margin-bottom: 1rem;">Ready to Share Your Research?</h2>
+    <p
+        style="font-size: 1.15rem; max-width: 650px; margin-left: auto; margin-right: auto; margin-bottom: 2.25rem; opacity: 0.95;">
+        Join thousands of student researchers building their academic portfolio and earning verifiable digital
+        certificates on ScholarForge today.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('papers.upload') }}" class="btn btn-accent"
+            style="font-size: 1.1rem; padding: 1rem 2.5rem;">📤 Publish Your Paper Now</a>
+        {% else %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-accent"
+            style="font-size: 1.1rem; padding: 1rem 2.5rem;">✨ Create Free Account</a>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}

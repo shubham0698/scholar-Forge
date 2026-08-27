@@ -1,57 +1,314 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard — ScholarForge{% endblock %}
+{% block title %}Analytics Dashboard — ScholarForge{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2>Welcome back, {{ name }}!</h2>
-    <p>Manage your academic research and publications from here.</p>
+<!-- Include Chart.js library for interactive analytics visualizer -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Dashboard Welcome Hero Banner -->
+<div class="profile-hero-card" style="margin-top: 1rem;">
+    <div class="profile-hero-content">
+        <div>
+            <span class="badge badge-success" style="margin-bottom: 0.5rem;">📊 Real-time Research Analytics</span>
+            <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Welcome back, {{ name }}! 👋</h1>
+            <p class="text-secondary" style="font-size: 1.05rem; max-width: 650px; margin-bottom: 0;">
+                Track manuscript engagement, monitor peer reviews, and manage your verified academic certifications.
+            </p>
+        </div>
+        <div class="profile-hero-actions">
+            <a href="{{ url_for('papers.upload') }}" class="btn btn-primary">📤 Publish New Paper</a>
+            <a href="{{ url_for('papers.my_publications') }}" class="btn">📚 My Publications</a>
+        </div>
+    </div>
 </div>
 
-<!-- Stats row -->
-<div class="card-grid" style="margin-bottom: 2.5rem;">
-    <div class="card" style="text-align: center;">
-        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--primary);">{{ paper_count }}</h3>
-        <p class="text-muted mb-0">Total Papers</p>
+<!-- KPI Metrics Cards Grid -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-top">
+            <div class="kpi-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">📄</div>
+            <span class="trend-badge trend-up">Active Author</span>
+        </div>
+        <div class="kpi-value text-primary">{{ paper_count }}</div>
+        <div class="kpi-title">Total Papers</div>
     </div>
-    <div class="card" style="text-align: center;">
-        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--success);">{{ approved_count }}</h3>
-        <p class="text-muted mb-0">Approved</p>
+
+    <div class="kpi-card">
+        <div class="kpi-top">
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">✅</div>
+            <span class="trend-badge trend-up">
+                {% if paper_count > 0 %}
+                    {{ ((approved_count / paper_count) * 100)|round|int }}% Approved
+                {% else %}
+                    100% Rate
+                {% endif %}
+            </span>
+        </div>
+        <div class="kpi-value text-success">{{ approved_count }}</div>
+        <div class="kpi-title">Approved Papers</div>
     </div>
-    <div class="card" style="text-align: center;">
-        <h3 style="font-size: 2rem; margin-bottom: 0.25rem; color: var(--accent);">{{ cert_count }}</h3>
-        <p class="text-muted mb-0">Certificates</p>
+
+    <div class="kpi-card">
+        <div class="kpi-top">
+            <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--accent);">🎓</div>
+            <span class="trend-badge trend-up">Verified</span>
+        </div>
+        <div class="kpi-value text-accent">{{ cert_count }}</div>
+        <div class="kpi-title">Certificates Earned</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-top">
+            <div class="kpi-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">👁️</div>
+            <span class="trend-badge trend-up">Readership</span>
+        </div>
+        <div class="kpi-value text-primary">{{ total_views }}</div>
+        <div class="kpi-title">Total Paper Views</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-top">
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">📥</div>
+            <span class="trend-badge trend-up">PDF Downloads</span>
+        </div>
+        <div class="kpi-value text-success">{{ total_downloads }}</div>
+        <div class="kpi-title">Total Downloads</div>
     </div>
 </div>
 
-<div class="card-grid">
+<!-- Interactive Analytics Charts Section -->
+{% if paper_count > 0 %}
+<div class="dashboard-analytics-grid">
+    <!-- Chart 1: Paper Performance (Views vs Downloads) -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3>📈 Research Performance Analytics</h3>
+                <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+                    Views vs PDF downloads for your published manuscripts
+                </p>
+            </div>
+            <span class="badge" style="margin-bottom: 0;">Live Data</span>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Domain Categories Breakdown -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3>🧩 Research Categories Breakdown</h3>
+                <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">Distribution of papers by domain</p>
+            </div>
+            <span class="badge badge-success" style="margin-bottom: 0;">Domains</span>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card" style="margin-bottom: 2.5rem; text-align: center; padding: 2.5rem 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.03), var(--bg-card));">
+    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📊</div>
+    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Real-time Analytics Unavailable</h3>
+    <p class="text-secondary" style="max-width: 520px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+        Publish your first research manuscript to unlock live readership engagement charts, view metrics, and domain category visualizations.
+    </p>
+    <a href="{{ url_for('papers.upload') }}" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">📤 Upload Your First Paper</a>
+</div>
+{% endif %}
+
+<!-- Top Performing Manuscript Highlight -->
+{% if top_paper %}
+<div class="card" style="margin-bottom: 2.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), var(--bg-card)); border-color: rgba(99, 102, 241, 0.25);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+            <span class="badge badge-success" style="margin-bottom: 0.5rem;">🌟 Top Performing Paper</span>
+            <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">
+                <a href="{{ url_for('public.paper_detail', id=top_paper.id) }}">{{ top_paper.title }}</a>
+            </h3>
+            <p class="text-secondary" style="font-size: 0.92rem; margin-bottom: 1rem;">
+                {{ top_paper.abstract[:200] }}...
+            </p>
+            <div class="paper-meta">
+                <span>🏷️ {{ top_paper.category }}</span>
+                <span>👁️ <strong>{{ top_paper.views_count or 0 }}</strong> Views</span>
+                <span>📥 <strong>{{ top_paper.downloads_count or 0 }}</strong> Downloads</span>
+                {% if top_paper.plagiarism_score is not none %}
+                <span class="text-success">🔍 Plagiarism: {{ top_paper.plagiarism_score }}%</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="paper-actions" style="flex-direction: column; width: 200px;">
+            <a href="{{ url_for('public.paper_detail', id=top_paper.id) }}" class="btn btn-primary" style="width: 100%;">View Full Metrics</a>
+            {% if top_paper.file_path %}
+            <a href="{{ url_for('papers.view_pdf', id=top_paper.id) }}" class="btn" style="width: 100%;" target="_blank">📄 View PDF</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Claim Co-authorship Widget -->
+{% if co_authored_papers %}
+<div class="card" style="margin-bottom: 2.5rem; border-color: var(--primary-light);">
+    <h3 style="margin-bottom: 0.5rem;">👥 Co-Authorship Claims Available</h3>
+    <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.25rem;">You have been listed as a co-author on the following papers. Link them to your profile:</p>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for c in co_authored_papers %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem;">
+            <div style="flex: 1; min-width: 200px;">
+                <strong>{{ c.paper.title }}</strong><br>
+                <small class="text-muted">Role: {{ c.role }} | Affiliation: {{ c.affiliation or 'N/A' }}</small>
+            </div>
+            <form action="{{ url_for('dashboard.claim_coauthorship', contributor_id=c.id) }}" method="POST" style="margin: 0; width: 100%;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem; width: 100%;">Link to Account</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Management Cards Grid -->
+<h3 class="mb-3">🚀 Platform Management & Tools</h3>
+<div class="card-grid" style="margin-bottom: 3rem;">
     <div class="card">
         <div class="card-icon">📤</div>
         <h3>Upload New Paper</h3>
-        <p>Submit your latest research for publication and certification.</p>
-        <a href="{{ url_for('upload') }}" class="btn btn-primary mt-3">Start Upload</a>
+        <p>Submit your latest manuscript for peer review, DOI assignment, and certificate issuance.</p>
+        <a href="{{ url_for('papers.upload') }}" class="btn btn-primary mt-3">Start Upload</a>
     </div>
 
     <div class="card">
         <div class="card-icon">📚</div>
         <h3>My Publications</h3>
-        <p>View, edit, or manage your published and private research papers.</p>
-        <a href="{{ url_for('my_publications') }}" class="btn mt-3">View Papers</a>
+        <p>Manage your research portfolio, track submission statuses, or edit manuscript details.</p>
+        <a href="{{ url_for('papers.my_publications') }}" class="btn mt-3">View Papers</a>
     </div>
 
     <div class="card">
         <div class="card-icon">🎓</div>
         <h3>My Certificates</h3>
-        <p>View and download your official ScholarForge PDF certificates.</p>
-        <a href="{{ url_for('my_certificates') }}" class="btn mt-3">View Certificates</a>
+        <p>View and download official ScholarForge PDF certificates with embedded QR codes.</p>
+        <a href="{{ url_for('papers.my_certificates') }}" class="btn mt-3">View Certificates</a>
     </div>
 
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="card">
         <div class="card-icon">🌐</div>
         <h3>Explore Research</h3>
-        <p>Browse published papers from researchers around the world.</p>
-        <a href="{{ url_for('explore') }}" class="btn mt-3">Explore</a>
+        <p>Browse published papers, citation metrics, and academic topics from researchers worldwide.</p>
+        <a href="{{ url_for('public.explore') }}" class="btn mt-3">Explore Papers</a>
     </div>
 </div>
 
+<!-- JavaScript to initialize Chart.js graphs -->
+{% if paper_count > 0 %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Parse Jinja JSON data
+        const paperTitles = {{ chart_paper_titles|safe }};
+        const viewsData = {{ chart_views|safe }};
+        const downloadsData = {{ chart_downloads|safe }};
+        const categoryLabels = {{ categories_labels|safe }};
+        const categoryCounts = {{ categories_counts|safe }};
+
+        // Render Performance Chart (Bar chart for Views vs Downloads)
+        const ctxPerf = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctxPerf, {
+            type: 'bar',
+            data: {
+                labels: paperTitles,
+                datasets: [
+                    {
+                        label: 'Paper Views',
+                        data: viewsData,
+                        backgroundColor: 'rgba(99, 102, 241, 0.75)',
+                        borderColor: '#6366f1',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'PDF Downloads',
+                        data: downloadsData,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { family: 'Inter', size: 12 },
+                            usePointStyle: true,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        padding: 10,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { family: 'Inter', size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                        ticks: { font: { family: 'Inter', size: 11 } }
+                    }
+                }
+            }
+        });
+
+        // Render Category Chart (Doughnut Chart)
+        const ctxCat = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryCounts,
+                    backgroundColor: [
+                        '#6366f1',
+                        '#10b981',
+                        '#f59e0b',
+                        '#3b82f6',
+                        '#ec4899',
+                        '#8b5cf6'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: { family: 'Inter', size: 11 },
+                            usePointStyle: true,
+                            padding: 12
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

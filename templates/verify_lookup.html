@@ -10,7 +10,7 @@
 
 <div class="form-container" style="margin-top: 0; text-align: center;">
     <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 1.5rem; color: var(--primary);">🛡️</div>
-    <form action="{{ url_for('verify_lookup') }}" method="POST">
+    <form action="{{ url_for('public.verify_lookup') }}" method="POST">
         <div class="form-group">
             <input type="text" name="certificate_id" class="form-control" placeholder="e.g. SF-CERT-1A2B3C4D" style="text-align: center; font-size: 1.1rem; padding: 1rem;" required>
         </div>
