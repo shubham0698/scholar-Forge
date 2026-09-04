@@ -1,17 +1,28 @@
-from flask import Blueprint, render_template, request, abort, flash, redirect, url_for
+from flask import Blueprint, render_template, request, abort, flash, redirect, url_for, send_file
 from flask_login import current_user
-from models import db, Paper, User, Certificate
+from models import db, Paper, User, Certificate, Payment
 
 public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
 def index():
-    total_papers = Paper.query.filter_by(visibility='public', status='approved').count()
+    public_papers_query = Paper.query.join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    )
+    total_papers = public_papers_query.count()
     total_users = User.query.count()
-    total_certs = Certificate.query.count()
-    recent_papers = Paper.query.filter_by(visibility='public', status='approved').order_by(Paper.created_at.desc()).limit(3).all()
-    categories = db.session.query(Paper.category).filter_by(visibility='public', status='approved').distinct().limit(6).all()
+    total_certs = Certificate.query.join(Paper, Certificate.paper_id == Paper.id).join(Payment, Paper.id == Payment.paper_id).filter(Payment.status == 'completed').count()
+    recent_papers = public_papers_query.order_by(Paper.created_at.desc()).limit(3).all()
+    
+    categories = db.session.query(Paper.category).join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    ).distinct().limit(6).all()
     categories = [c[0] for c in categories] if categories else ['Computer Science', 'Biotechnology', 'Electrical Engineering', 'Physics']
+    
     return render_template(
         'index.html',
         total_papers=total_papers,
@@ -25,12 +36,19 @@ def index():
 def explore():
     page = request.args.get('page', 1, type=int)
     category = request.args.get('category', '')
-    query = Paper.query.filter_by(visibility='public')
+    query = Paper.query.join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    )
     if category:
-        query = query.filter_by(category=category)
+        query = query.filter(Paper.category == category)
     papers = query.order_by(Paper.created_at.desc()).all()
-    categories = db.session.query(Paper.category).filter_by(
-        visibility='public'
+    
+    categories = db.session.query(Paper.category).join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
     ).distinct().all()
     categories = [c[0] for c in categories]
     return render_template('explore.html', papers=papers, categories=categories, selected_category=category)
@@ -39,26 +57,37 @@ def explore():
 def paper_detail(id):
     paper = Paper.query.get_or_404(id)
     
+    is_paid = bool(paper.payment and paper.payment.status == 'completed')
+    is_author_or_admin = current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin)
+
     # Private papers restricted to author & admin
     if paper.visibility == 'private':
-        if not current_user.is_authenticated or (paper.user_id != current_user.id and not current_user.is_admin):
+        if not is_author_or_admin:
             flash('This research paper is marked as private by the author.')
             return redirect(url_for('public.explore'))
-    
+
+    # Unpaid / Pending payment papers restricted to author & admin
+    if not is_paid:
+        if not is_author_or_admin:
+            flash('This research paper is awaiting publication payment and is not yet publicly accessible.')
+            return redirect(url_for('public.explore'))
+
     # Increment view count
     paper.views_count = (paper.views_count or 0) + 1
     db.session.commit()
     
     guide = paper.guides[0] if paper.guides else None
     contributors = paper.contributors
-    return render_template('paper_detail.html', paper=paper, guide=guide, contributors=contributors)
+    return render_template('paper_detail.html', paper=paper, guide=guide, contributors=contributors, payment_pending=(not is_paid))
 
 @public_bp.route('/search')
 def search():
     query = request.args.get('q', '').strip()
     if query:
-        results = Paper.query.join(User, Paper.user_id == User.id).filter(
+        results = Paper.query.join(User, Paper.user_id == User.id).join(Payment, Paper.id == Payment.paper_id).filter(
             (Paper.visibility == 'public'),
+            (Paper.status == 'approved'),
+            (Payment.status == 'completed'),
             (Paper.title.ilike(f'%{query}%')) |
             (Paper.abstract.ilike(f'%{query}%')) |
             (Paper.keywords.ilike(f'%{query}%')) |
@@ -73,7 +102,11 @@ def search():
 @public_bp.route('/sitemap.xml')
 def sitemap():
     from flask import Response, url_for
-    papers = Paper.query.filter_by(visibility='public', status='approved').all()
+    papers = Paper.query.join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    ).all()
     
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
@@ -124,6 +157,14 @@ Sitemap: {sitemap_url}
 def verify_certificate(certificate_id):
     cert = Certificate.query.filter_by(certificate_id=certificate_id).first_or_404()
     paper = cert.paper
+
+    is_paid = bool(paper.payment and paper.payment.status == 'completed')
+    is_author_or_admin = current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin)
+
+    if not is_paid and not is_author_or_admin:
+        flash('Certificate is inactive as publication payment is pending.')
+        return redirect(url_for('public.index'))
+
     author = paper.author
     guide = paper.guides[0] if paper.guides else None
     return render_template(
@@ -132,6 +173,7 @@ def verify_certificate(certificate_id):
         paper=paper,
         author=author,
         guide=guide,
+        payment_pending=(not is_paid)
     )
 
 @public_bp.route('/public-download-certificate/<certificate_id>')
@@ -140,6 +182,14 @@ def public_download_certificate(certificate_id):
     from datetime import datetime
     cert = Certificate.query.filter_by(certificate_id=certificate_id).first_or_404()
     paper = cert.paper
+
+    is_paid = bool(paper.payment and paper.payment.status == 'completed')
+    is_author_or_admin = current_user.is_authenticated and (paper.user_id == current_user.id or current_user.is_admin)
+
+    if not is_paid and not is_author_or_admin:
+        flash('Certificate download is unavailable as publication payment is pending.')
+        return redirect(url_for('public.index'))
+
     verify_url = url_for('public.verify_certificate', certificate_id=cert.certificate_id, _external=True)
     paper_url = url_for('public.paper_detail', id=paper.id, _external=True)
     guide = paper.guides[0] if paper.guides else None
@@ -191,9 +241,13 @@ def privacy():
 
 @public_bp.route('/about')
 def about():
-    total_papers = Paper.query.filter_by(status='approved').count()
+    total_papers = Paper.query.join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    ).count()
     total_users = User.query.count()
-    total_certs = Certificate.query.count()
+    total_certs = Certificate.query.join(Paper, Certificate.paper_id == Paper.id).join(Payment, Paper.id == Payment.paper_id).filter(Payment.status == 'completed').count()
     return render_template(
         'about.html',
         total_papers=total_papers,
@@ -211,7 +265,11 @@ def contact():
 @public_bp.route('/oai')
 def oai_pmh():
     from flask import Response
-    papers = Paper.query.filter_by(visibility='public', status='approved').all()
+    papers = Paper.query.join(Payment, Paper.id == Payment.paper_id).filter(
+        Paper.visibility == 'public',
+        Paper.status == 'approved',
+        Payment.status == 'completed'
+    ).all()
     xml_data = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_data.append('<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"')
     xml_data.append('         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
@@ -265,3 +323,4 @@ def oai_pmh():
     xml_data.append('</OAI-PMH>')
     
     return Response('\n'.join(xml_data), mimetype='application/xml')
+

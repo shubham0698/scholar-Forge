@@ -18,6 +18,14 @@ venv.bak/
 instance/
 .webassets-cache
 
+# Uploads & Generated Certificates / QR Codes
+uploads/*
+!uploads/.gitkeep
+static/qrcodes/*
+!static/qrcodes/.gitkeep
+static/certificates/*
+!static/certificates/.gitkeep
+
 # Environment variables
 .env
 .venv

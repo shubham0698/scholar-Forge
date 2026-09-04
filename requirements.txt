@@ -8,3 +8,4 @@ Pillow==12.2.0
 gunicorn==23.0.0
 Flask-Mail==0.10.0
 python-dotenv==1.0.1
+razorpay==2.0.1

@@ -1,76 +1,266 @@
 {% extends 'base.html' %}
 
-{% block title %}Payment — ScholarForge{% endblock %}
+{% block title %}Razorpay Payment — ScholarForge{% endblock %}
 
 {% block content %}
-<div class="hero" style="padding: 3rem 0 1rem;">
-    <h2>Publication Processing Fee</h2>
-    <p>Complete your payment to finalize the publication and generate your official certificate.</p>
+<div class="hero" style="padding: 2.5rem 0 1.25rem;">
+    <div style="display: inline_flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); padding: 0.35rem 0.9rem; border-radius: 9999px; color: var(--primary); font-weight: 600; font-size: 0.85rem; margin-bottom: 0.75rem;">
+        💳 Official Razorpay Secured Payment Gateway
+    </div>
+    <h2>Publication Processing &amp; Certification Fee</h2>
+    <p>Complete your payment to finalize paper approval, assign your DOI, and generate your official QR-verified PDF certificate.</p>
 </div>
 
-<div class="form-container">
-    <h3>Payment Summary</h3>
-    <hr>
-
-    <div class="payment-line">
-        <span>Paper</span>
-        <strong style="max-width: 250px; text-align: right;">{{ paper.title }}</strong>
-    </div>
-    <div class="payment-line">
-        <span>Publication ID</span>
-        <strong style="font-family: monospace;">{{ paper.publication_id }}</strong>
-    </div>
-    <div class="payment-line">
-        <span>Standard Publication Fee</span>
-        <strong>$25.00</strong>
-    </div>
-    <div class="payment-line">
-        <span>Digital Certificate</span>
-        <strong class="text-success">Included</strong>
-    </div>
-
-    <hr>
-
-    <div class="payment-total">
-        <span>Total</span>
-        <strong>$25.00</strong>
-    </div>
-
-    <hr>
-
-    <form action="{{ url_for('payments.payment', paper_id=paper.id) }}" method="POST">
-        <div class="form-group">
-            <label style="font-weight: 600;">🎓 Certificate Layout Format</label>
-            <select name="cert_type" class="form-control" style="font-weight: 600; border-color: var(--primary);" required>
-                <option value="publication" selected>📜 Standard Academic Research Publication Certificate</option>
-                <option value="presentation">🎤 Publication &amp; International Conference Presentation Certificate</option>
-            </select>
+<div class="form-container" style="max-width: 620px; border: 1px solid var(--border-color); box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); border-radius: var(--radius-lg); background: var(--card-bg);">
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+        <div>
+            <h3 style="margin: 0; font-size: 1.25rem; color: var(--text-primary);">Order Summary</h3>
+            <span class="text-secondary" style="font-size: 0.85rem;">ScholarForge Academic Publication Platform</span>
         </div>
+        <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay Logo" style="height: 32px; width: auto;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
+    </div>
 
-        <div class="form-group">
-            <label>Cardholder Name</label>
-            <input type="text" class="form-control" placeholder="John Doe" required>
-        </div>
-        <div class="form-group">
-            <label>Card Number</label>
-            <input type="text" class="form-control" placeholder="•••• •••• •••• ••••" required>
-        </div>
-        <div class="gap-row">
-            <div class="form-group" style="flex: 1;">
-                <label>Expiry (MM/YY)</label>
-                <input type="text" class="form-control" placeholder="MM/YY" required>
-            </div>
-            <div class="form-group" style="flex: 1;">
-                <label>CVV</label>
-                <input type="text" class="form-control" placeholder="•••" required>
-            </div>
-        </div>
+    <div class="payment-line" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span class="text-secondary">Research Paper</span>
+        <strong style="max-width: 320px; text-align: right; color: var(--text-primary);">{{ paper.title }}</strong>
+    </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Pay $25.00 &amp; Generate Certificate</button>
-    </form>
+    <div class="payment-line" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span class="text-secondary">Publication ID</span>
+        <strong style="font-family: monospace; background: rgba(99, 102, 241, 0.08); padding: 0.15rem 0.5rem; border-radius: 4px; color: var(--primary);">{{ paper.publication_id or 'SF-2026' }}</strong>
+    </div>
 
-    <p class="text-center text-muted mt-3" style="font-size: 0.8rem;">
-        🔒 This is a demo. No real payment is processed.
-    </p>
+    <div class="payment-line" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span class="text-secondary">Author</span>
+        <strong style="color: var(--text-primary);">{{ paper.author.username }}</strong>
+    </div>
+
+    <div class="payment-line" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span class="text-secondary">Standard Processing Fee</span>
+        <strong style="color: var(--text-primary);">{{ currency }} {{ "%.2f"|format(amount) }}</strong>
+    </div>
+
+    <div class="payment-line" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span class="text-secondary">QR Verification &amp; DOI Allocation</span>
+        <strong class="text-success" style="font-weight: 600;">Included (FREE)</strong>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 1.25rem 0;">
+
+    <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: var(--text-primary);">
+            🎓 Select Certificate Layout Format
+        </label>
+        <select id="cert_type_select" class="form-control" style="font-weight: 600; padding: 0.65rem 0.85rem; border-color: var(--primary); background: var(--bg-surface);">
+            <option value="publication" selected>📜 Standard Academic Research Publication Certificate</option>
+            <option value="presentation">🎤 Publication &amp; International Conference Presentation Certificate</option>
+        </select>
+    </div>
+
+    <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-size: 1.2rem;">⚡</span>
+        <div>
+            <strong>Instant Certificate Generation:</strong> Upon payment completion, your official PDF certificate with verified QR code will be generated immediately.
+        </div>
+    </div>
+
+    <div class="payment-total" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0.85rem 1rem; background: rgba(99, 102, 241, 0.05); border-radius: var(--radius-sm);">
+        <span style="font-size: 1.1rem; font-weight: 600;">Total Payable</span>
+        <strong style="font-size: 1.5rem; color: var(--primary);">{{ currency }} {{ "%.2f"|format(amount) }}</strong>
+    </div>
+
+    <!-- Payment status message box -->
+    <div id="payment-status-box" style="display: none; padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.9rem; text-align: center;"></div>
+
+    <!-- Razorpay Action Button -->
+    <button type="button" id="pay-btn" onclick="initiateRazorpayPayment()" class="btn btn-primary" style="width: 100%; font-size: 1.05rem; padding: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);">
+        <span>🔒 Pay {{ currency }} {{ "%.2f"|format(amount) }} via Razorpay</span>
+    </button>
+
+    <!-- Payment Methods Supported -->
+    <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <p class="text-secondary" style="font-size: 0.8rem; margin-bottom: 0.5rem;">Supported Payment Methods via Razorpay</p>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">
+            <span style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 4px;">🟢 Google Pay / PhonePe / Paytm UPI</span>
+            <span style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 4px;">💳 Credit &amp; Debit Cards</span>
+            <span style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 4px;">🏦 NetBanking (50+ Banks)</span>
+            <span style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.25rem 0.6rem; border-radius: 4px;">👛 Mobile Wallets</span>
+        </div>
+    </div>
 </div>
+
+<!-- Razorpay Checkout SDK Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+function initiateRazorpayPayment() {
+    const payBtn = document.getElementById('pay-btn');
+    const statusBox = document.getElementById('payment-status-box');
+    const certTypeSelect = document.getElementById('cert_type_select');
+    const selectedCertType = certTypeSelect ? certTypeSelect.value : 'publication';
+
+    // UI Loading state
+    payBtn.disabled = true;
+    payBtn.style.opacity = '0.7';
+    payBtn.innerHTML = '⌛ Initializing Razorpay Checkout...';
+    
+    statusBox.style.display = 'block';
+    statusBox.style.background = 'rgba(99, 102, 241, 0.1)';
+    statusBox.style.color = 'var(--primary)';
+    statusBox.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+    statusBox.innerHTML = 'Connecting to Razorpay payment servers...';
+
+    // Step 1: Call Flask backend to create Razorpay Order
+    fetch("{{ url_for('payments.create_order', paper_id=paper.id) }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            cert_type: selectedCertType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            showError(data.message || "Failed to create payment order.");
+            return;
+        }
+
+        // Step 2: Configure Razorpay Checkout modal
+        const options = {
+            "key": data.key_id,
+            "amount": data.amount,
+            "currency": data.currency,
+            "name": "ScholarForge",
+            "description": "Publication Fee & Digital Certificate",
+            "image": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+            "order_id": data.order_id,
+            "handler": function (response) {
+                // Step 3: Handle payment success callback from Razorpay
+                statusBox.style.background = 'rgba(16, 185, 129, 0.1)';
+                statusBox.style.color = 'var(--success)';
+                statusBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                statusBox.innerHTML = '✓ Payment captured! Verifying signature and issuing certificate...';
+
+                // Step 4: Verify payment with Flask backend
+                fetch("{{ url_for('payments.verify_payment', paper_id=paper.id) }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
+                        cert_type: data.cert_type
+                    })
+                })
+                .then(res => res.json())
+                .then(verifyResult => {
+                    if (verifyResult.success) {
+                        window.location.href = verifyResult.redirect_url;
+                    } else {
+                        showError(verifyResult.message || "Payment verification failed.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Verification error:", err);
+                    showError("Error verifying payment signature. Please contact support.");
+                });
+            },
+            "prefill": {
+                "name": data.user_name || "",
+                "email": data.user_email || ""
+            },
+            "notes": {
+                "paper_id": "{{ paper.id }}",
+                "paper_title": data.paper_title
+            },
+            "theme": {
+                "color": "#6366f1"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    resetButton();
+                    statusBox.style.display = 'none';
+                }
+            }
+        };
+
+        // Fallback for mock/test sandbox environment when Razorpay script cannot open modal or using test simulation
+        if (typeof Razorpay === 'undefined') {
+            console.warn("Razorpay script not loaded, using instant sandbox verification fallback.");
+            simulateSandboxPayment(data.order_id, selectedCertType);
+            return;
+        }
+
+        try {
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                showError("Payment Failed: " + (response.error.description || "Transaction declined"));
+            });
+            rzp.open();
+        } catch(e) {
+            console.error("Razorpay modal error:", e);
+            simulateSandboxPayment(data.order_id, selectedCertType);
+        }
+    })
+    .catch(err => {
+        console.error("Order creation error:", err);
+        showError("Unable to connect to payment service.");
+    });
+}
+
+function simulateSandboxPayment(orderId, certType) {
+    const statusBox = document.getElementById('payment-status-box');
+    statusBox.style.display = 'block';
+    statusBox.style.background = 'rgba(245, 158, 11, 0.1)';
+    statusBox.style.color = 'var(--accent)';
+    statusBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+    statusBox.innerHTML = '⚡ Processing sandbox test payment...';
+
+    const mockPaymentId = 'pay_sim_' + Math.random().toString(36).substring(2, 12);
+    
+    fetch("{{ url_for('payments.verify_payment', paper_id=paper.id) }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            razorpay_order_id: orderId,
+            razorpay_payment_id: mockPaymentId,
+            razorpay_signature: "mock_signature_test",
+            cert_type: certType
+        })
+    })
+    .then(res => res.json())
+    .then(verifyResult => {
+        if (verifyResult.success) {
+            window.location.href = verifyResult.redirect_url;
+        } else {
+            showError(verifyResult.message || "Sandbox payment failed.");
+        }
+    })
+    .catch(err => {
+        showError("Sandbox execution failed.");
+    });
+}
+
+function showError(msg) {
+    const statusBox = document.getElementById('payment-status-box');
+    statusBox.style.display = 'block';
+    statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
+    statusBox.style.color = 'var(--danger)';
+    statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+    statusBox.innerHTML = '❌ ' + msg;
+    resetButton();
+}
+
+function resetButton() {
+    const payBtn = document.getElementById('pay-btn');
+    payBtn.disabled = false;
+    payBtn.style.opacity = '1';
+    payBtn.innerHTML = '<span>🔒 Pay {{ currency }} {{ "%.2f"|format(amount) }} via Razorpay</span>';
+}
+</script>
 {% endblock %}
+

@@ -87,10 +87,13 @@ class Certificate(db.Model):
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    amount = db.Column(db.Float, nullable=False, default=25.00)
-    currency = db.Column(db.String(10), default='USD')
+    amount = db.Column(db.Float, nullable=False, default=1999.00)
+    currency = db.Column(db.String(10), default='INR')
     status = db.Column(db.String(50), default='pending') # pending, completed, failed
     transaction_ref = db.Column(db.String(100), nullable=True)
+    razorpay_order_id = db.Column(db.String(100), nullable=True)
+    razorpay_payment_id = db.Column(db.String(100), nullable=True)
+    razorpay_signature = db.Column(db.String(250), nullable=True)
     paid_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

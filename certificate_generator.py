@@ -54,54 +54,65 @@ def generate_qr_code(data, filename):
 
 
 def draw_dummy_signature_alexander(c, x, y):
-    """Draws an authentic handwritten ink signature for Dr. Alexander Vance."""
-    c.saveState()
-    c.setStrokeColor(HexColor("#1e3a8a")) # Deep Royal Ink Blue
-    c.setLineWidth(1.6)
-    
-    path = c.beginPath()
-    # 'Dr. A' loop
-    path.moveTo(x + 5, y + 8)
-    path.curveTo(x + 10, y + 28, x + 22, y + 32, x + 28, y + 10)
-    path.curveTo(x + 32, y + 4, x + 38, y + 18, x + 48, y + 22)
-    path.moveTo(x + 16, y + 18)
-    path.lineTo(x + 42, y + 16)
-    
-    # 'Vance' cursive flourish
-    path.moveTo(x + 55, y + 24)
-    path.curveTo(x + 60, y + 6, x + 68, y + 8, x + 76, y + 20)
-    path.curveTo(x + 82, y + 12, x + 90, y + 15, x + 98, y + 11)
-    path.curveTo(x + 104, y + 18, x + 112, y + 9, x + 128, y + 22)
-    c.drawPath(path, fill=False, stroke=True)
-    
-    # Signature underline flourish
-    c.setLineWidth(1.1)
-    path2 = c.beginPath()
-    path2.moveTo(x + 10, y + 4)
-    path2.curveTo(x + 50, y + 1, x + 90, y + 3, x + 135, y + 6)
-    c.drawPath(path2, fill=False, stroke=True)
-    
-    c.restoreState()
+    """Draws hardcoded handwritten signature image for Editor-in-Chief."""
+    sig_path = os.path.join('static', 'img', 'signature.png')
+    if os.path.exists(sig_path):
+        sig_img = ImageReader(sig_path)
+        c.drawImage(
+            sig_img,
+            x,
+            y,
+            width=135,
+            height=42,
+            preserveAspectRatio=True,
+            mask='auto'
+        )
+    else:
+        c.saveState()
+        c.setStrokeColor(HexColor("#1e3a8a"))
+        c.setLineWidth(1.6)
+        path = c.beginPath()
+        path.moveTo(x + 5, y + 8)
+        path.curveTo(x + 10, y + 28, x + 22, y + 32, x + 28, y + 10)
+        path.curveTo(x + 32, y + 4, x + 38, y + 18, x + 48, y + 22)
+        path.moveTo(x + 16, y + 18)
+        path.lineTo(x + 42, y + 16)
+        path.moveTo(x + 55, y + 24)
+        path.curveTo(x + 60, y + 6, x + 68, y + 8, x + 76, y + 20)
+        path.curveTo(x + 82, y + 12, x + 90, y + 15, x + 98, y + 11)
+        path.curveTo(x + 104, y + 18, x + 112, y + 9, x + 128, y + 22)
+        c.drawPath(path, fill=False, stroke=True)
+        c.restoreState()
 
 def draw_dummy_signature_generic(c, x, y):
-    """Draws a stylized handwritten ink signature for co-signers."""
-    c.saveState()
-    c.setStrokeColor(HexColor("#0f172a")) # Dark Ink
-    c.setLineWidth(1.4)
-    
-    path = c.beginPath()
-    path.moveTo(x + 5, y + 12)
-    path.curveTo(x + 15, y + 30, x + 25, y + 5, x + 35, y + 24)
-    path.curveTo(x + 45, y + 10, x + 55, y + 22, x + 65, y + 8)
-    path.curveTo(x + 75, y + 20, x + 85, y + 6, x + 105, y + 18)
-    c.drawPath(path, fill=False, stroke=True)
-    
-    path2 = c.beginPath()
-    path2.moveTo(x + 8, y + 4)
-    path2.curveTo(x + 45, y + 1, x + 80, y + 3, x + 115, y + 5)
-    c.drawPath(path2, fill=False, stroke=True)
-    
-    c.restoreState()
+    """Draws hardcoded handwritten signature image for co-signer / chair."""
+    sig_path = os.path.join('static', 'img', 'signature_chair.png')
+    if not os.path.exists(sig_path):
+        sig_path = os.path.join('static', 'img', 'signature.png')
+
+    if os.path.exists(sig_path):
+        sig_img = ImageReader(sig_path)
+        c.drawImage(
+            sig_img,
+            x,
+            y,
+            width=125,
+            height=40,
+            preserveAspectRatio=True,
+            mask='auto'
+        )
+    else:
+        c.saveState()
+        c.setStrokeColor(HexColor("#0f172a"))
+        c.setLineWidth(1.4)
+        path = c.beginPath()
+        path.moveTo(x + 5, y + 12)
+        path.curveTo(x + 15, y + 30, x + 25, y + 5, x + 35, y + 24)
+        path.curveTo(x + 45, y + 10, x + 55, y + 22, x + 65, y + 8)
+        path.curveTo(x + 75, y + 20, x + 85, y + 6, x + 105, y + 18)
+        c.drawPath(path, fill=False, stroke=True)
+        c.restoreState()
+
 
 def generate_certificate_pdf(
     certificate_id,
@@ -288,7 +299,7 @@ def generate_certificate_pdf(
 
     c.setFillColor(secondary_color)
     c.setFont("Helvetica-Bold", 9.5)
-    c.drawString(80, y_sig, "Dr. Alexander Vance")
+    c.drawString(80, y_sig, "Mr. K. N. Holkar")
     c.setFont("Helvetica", 8)
     c.setFillColor(HexColor("#64748b"))
     c.drawString(80, y_sig - 10, "Editor-in-Chief, ScholarForge")

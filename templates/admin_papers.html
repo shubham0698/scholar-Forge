@@ -74,17 +74,24 @@
                         <a href="{{ url_for('papers.view_pdf', id=p.id) }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" target="_blank">📄 View PDF</a>
                         {% endif %}
 
-                        {% if p.status == 'pending' %}
+                        {% if p.status == 'pending' or (p.status == 'approved' and (not p.payment or p.payment.status != 'completed')) %}
                         <form action="{{ url_for('admin.admin_approve', id=p.id) }}" method="POST" style="margin:0;">
                             <input type="hidden" name="next" value="{{ request.url }}">
-                            <button type="submit" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Approve</button>
+                            <button type="submit" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Approve (Require Pay)</button>
                         </form>
+                        <form action="{{ url_for('admin.admin_approve_bypass', id=p.id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Approve & waive payment for this paper?');">
+                            <input type="hidden" name="next" value="{{ request.url }}">
+                            <button type="submit" class="btn btn-accent" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Bypass Payment</button>
+                        </form>
+                        {% endif %}
+                        {% if p.status == 'pending' %}
                         <form action="{{ url_for('admin.admin_reject', id=p.id) }}" method="POST" style="margin:0;" onsubmit="let r = prompt('Reason for rejecting this paper:'); if(!r) return false; this.rejection_reason.value = r;">
                             <input type="hidden" name="next" value="{{ request.url }}">
                             <input type="hidden" name="rejection_reason" value="">
                             <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Reject</button>
                         </form>
                         {% endif %}
+
 
                         <form action="{{ url_for('admin.admin_delete_paper', id=p.id) }}" method="POST" style="margin:0;">
                             <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="return confirm('Delete this paper permanently?');">Delete</button>

@@ -130,7 +130,16 @@
 </div>
 
 <!-- Status Notice Banners -->
-{% if paper.status == 'pending' %}
+{% if payment_pending %}
+<div style="background: rgba(99, 102, 241, 0.08); border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-size: 0.95rem; color: var(--text-primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        💳 <strong>Approved by Editorial Board — Payment Pending:</strong> Complete your publication fee payment to publish this paper publicly and generate your official QR-verified PDF certificate.
+    </div>
+    {% if current_user.is_authenticated and paper.user_id == current_user.id %}
+    <a href="{{ url_for('payments.payment', paper_id=paper.id) }}" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-weight: 600;">🔒 Complete Payment via Razorpay</a>
+    {% endif %}
+</div>
+{% elif paper.status == 'pending' %}
 <div style="background: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-size: 0.95rem; color: var(--text-primary);">
     ⏳ <strong>In Verification Phase:</strong> This research paper is currently undergoing peer review and editorial verification by ScholarForge editors. The author will be notified via email once approved.
 </div>
@@ -142,6 +151,7 @@
     </p>
 </div>
 {% endif %}
+
 
 <!-- 2-Column Main Layout Grid -->
 <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
