@@ -285,3 +285,81 @@ def assign_review(paper_id):
     
     flash(f'Paper assigned to reviewer "{reviewer.username}".')
     return redirect(url_for('admin.admin_panel'))
+
+
+# --- BACKUP & RESTORE MANAGEMENT ROUTES ---
+
+@admin_bp.route('/admin/backups')
+@login_required
+@admin_required
+def admin_backups():
+    from backup_manager import list_backups
+    backups = list_backups()
+    return render_template('admin_backups.html', backups=backups)
+
+
+@admin_bp.route('/admin/backups/create', methods=['POST'])
+@login_required
+@admin_required
+def admin_create_backup():
+    from backup_manager import create_backup
+    success, result, manifest = create_backup(creator_username=current_user.username)
+    if success:
+        flash(f'Backup snapshot "{result}" created successfully!')
+    else:
+        flash(f'Backup creation failed: {result}')
+    return redirect(url_for('admin.admin_backups'))
+
+
+@admin_bp.route('/admin/backups/download/<filename>')
+@login_required
+@admin_required
+def admin_download_backup(filename):
+    from flask import send_from_directory
+    from backup_manager import BACKUP_DIR
+    safe_filename = os.path.basename(filename)
+    full_path = os.path.join(BACKUP_DIR, safe_filename)
+    if os.path.exists(full_path):
+        return send_from_directory(BACKUP_DIR, safe_filename, as_attachment=True)
+    flash('Requested backup file not found.')
+    return redirect(url_for('admin.admin_backups'))
+
+
+@admin_bp.route('/admin/backups/restore', methods=['POST'])
+@login_required
+@admin_required
+def admin_restore_backup():
+    from backup_manager import restore_backup
+    
+    # Check if file upload was submitted
+    if 'backup_file' in request.files and request.files['backup_file'].filename:
+        file = request.files['backup_file']
+        if not file.filename.endswith('.zip'):
+            flash('Please upload a valid .zip backup archive.')
+            return redirect(url_for('admin.admin_backups'))
+        success, msg, manifest = restore_backup(file, creator_username=current_user.username)
+    else:
+        # Existing backup package selected from dropdown/list
+        filename = request.form.get('filename', '')
+        if not filename:
+            flash('No backup archive selected for restore.')
+            return redirect(url_for('admin.admin_backups'))
+        success, msg, manifest = restore_backup(filename, creator_username=current_user.username)
+
+    if success:
+        flash('System state restored successfully! (An automated pre-restore safety snapshot was saved before restoring).')
+    else:
+        flash(f'Restore operation failed: {msg}')
+        
+    return redirect(url_for('admin.admin_backups'))
+
+
+@admin_bp.route('/admin/backups/delete/<filename>', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_backup(filename):
+    from backup_manager import delete_backup
+    success, msg = delete_backup(filename)
+    flash(msg)
+    return redirect(url_for('admin.admin_backups'))
+

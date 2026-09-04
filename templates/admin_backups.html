@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Local Backup & Restore — ScholarForge Admin{% endblock %}
+
+{% block content %}
+<div class="page-header-row">
+    <div>
+        <h2>💾 System Backup & Restore</h2>
+        <p class="text-secondary">Create, download, upload, and restore full platform backups (Database, Papers, Certificates, &amp; QR Codes).</p>
+    </div>
+    <a href="{{ url_for('admin.admin_panel') }}" class="btn">Back to Dashboard</a>
+</div>
+
+<!-- Admin Subnav -->
+<div style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+    <a href="{{ url_for('admin.admin_papers') }}" class="btn btn-primary">Manage Papers</a>
+    <a href="{{ url_for('admin.admin_users') }}" class="btn btn-primary">Manage Users</a>
+    <a href="{{ url_for('admin.admin_backups') }}" class="btn btn-accent" style="font-weight: 700;">💾 Backup &amp; Restore</a>
+</div>
+
+<!-- Action Cards -->
+<div class="card-grid" style="margin-bottom: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+    <!-- Card 1: Create Backup -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div class="card-icon" style="margin: 0; font-size: 1.8rem;">⚡</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: var(--primary);">Create Instant Snapshot</h3>
+                    <p class="text-muted" style="margin: 0; font-size: 0.85rem;">Generate full timestamped backup archive</p>
+                </div>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                Captures a consistent SQLite database snapshot, manuscript uploads, generated certificates, and QR codes into a compressed <code>.zip</code> package.
+            </p>
+        </div>
+        <form action="{{ url_for('admin.admin_create_backup') }}" method="POST" style="margin: 0;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 600; padding: 0.75rem 1rem;">
+                📦 Create New Backup Package
+            </button>
+        </form>
+    </div>
+
+    <!-- Card 2: Upload & Restore Backup -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div class="card-icon" style="margin: 0; font-size: 1.8rem;">📤</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: var(--accent);">Upload &amp; Restore Backup</h3>
+                    <p class="text-muted" style="margin: 0; font-size: 0.85rem;">Restore from external <code>.zip</code> file</p>
+                </div>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                Upload an existing backup package file to restore system state. An automatic pre-restore safety snapshot will be created first.
+            </p>
+        </div>
+        <form action="{{ url_for('admin.admin_restore_backup') }}" method="POST" enctype="multipart/form-data" style="margin: 0; display: flex; flex-direction: column; gap: 0.65rem;" onsubmit="return confirm('WARNING: Restoring will overwrite active platform data with the uploaded backup contents. An automatic safety snapshot will be saved first. Continue?');">
+            <input type="file" name="backup_file" accept=".zip" class="form-control" style="font-size: 0.85rem; padding: 0.45rem; margin: 0;" required>
+            <button type="submit" class="btn btn-accent" style="width: 100%; font-weight: 600; padding: 0.75rem 1rem;">
+                🔄 Upload &amp; Execute Restore
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Important Notice Alert -->
+<div style="background: rgba(2, 132, 199, 0.08); border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 6px; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-start;">
+    <div style="font-size: 1.5rem; line-height: 1;">🛡️</div>
+    <div style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;">
+        <strong>Automated Safety Guarantee:</strong> Whenever a restore operation is triggered (from list or file upload), ScholarForge automatically generates a <code>pre_restore_safety_*.zip</code> snapshot of your current database and uploaded files before overwriting data. If something unexpected occurs, you can revert instantly.
+    </div>
+</div>
+
+<!-- Existing Backups Table -->
+<h3 class="mb-3">🗄️ Stored Backup Packages ({{ backups|length }})</h3>
+
+{% if backups %}
+<div class="table-container">
+    <table class="table-custom" style="min-width: 850px;">
+        <thead>
+            <tr>
+                <th>Backup File</th>
+                <th>Created At</th>
+                <th>Size</th>
+                <th>Type</th>
+                <th>Snapshot Stats</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in backups %}
+            <tr>
+                <td>
+                    <strong style="font-family: monospace; font-size: 0.9rem;">{{ b.filename }}</strong><br>
+                    <small class="text-muted">By: {{ b.creator }}</small>
+                </td>
+                <td style="white-space: nowrap;">{{ b.created_at }}</td>
+                <td style="white-space: nowrap;"><strong>{{ b.size_formatted }}</strong></td>
+                <td style="white-space: nowrap;">
+                    {% if b.is_safety %}
+                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-weight: 700;">🛡️ Pre-Restore Safety</span>
+                    {% else %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--success); font-weight: 700;">📦 Full Backup</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 0.85rem; color: var(--text-secondary);">
+                    👥 {{ b.users_count }} Users | 📄 {{ b.papers_count }} Papers<br>
+                    💳 {{ b.payments_count }} Payments | 🎓 {{ b.certs_count }} Certs
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                        <!-- Download -->
+                        <a href="{{ url_for('admin.admin_download_backup', filename=b.filename) }}" class="btn btn-secondary" style="padding: 0.4rem 0.7rem; font-size: 0.8rem; text-decoration: none;" title="Download ZIP">
+                            📥 Download
+                        </a>
+
+                        <!-- Restore -->
+                        <form action="{{ url_for('admin.admin_restore_backup') }}" method="POST" style="margin:0;" onsubmit="return confirm('Restore system from backup package {{ b.filename }}? Current state will be safely snapshotted first.');">
+                            <input type="hidden" name="filename" value="{{ b.filename }}">
+                            <button type="submit" class="btn btn-accent" style="padding: 0.4rem 0.7rem; font-size: 0.8rem;" title="Restore this Backup">
+                                🔄 Restore
+                            </button>
+                        </form>
+
+                        <!-- Delete -->
+                        <form action="{{ url_for('admin.admin_delete_backup', filename=b.filename) }}" method="POST" style="margin:0;" onsubmit="return confirm('Permanently delete backup package {{ b.filename }}? This cannot be undone.');">
+                            <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.65rem; font-size: 0.8rem;" title="Delete Backup">
+                                🗑️
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</div>
+    <h4>No Backup Packages Found</h4>
+    <p style="max-width: 450px; margin: 0 auto 1.5rem; font-size: 0.9rem;">
+        Click <strong>"Create New Backup Package"</strong> above to generate your first system snapshot.
+    </p>
+</div>
+{% endif %}
+
+{% endblock %}
